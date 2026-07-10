@@ -1,0 +1,103 @@
+---
+/**
+ * AutomationFlow — the recurring signature graphic: a lead flowing through the
+ * system (lead → instant text-back → pipeline → booked → review). Nodes pulse
+ * in sequence and a dot travels the connectors. transform/opacity only;
+ * all motion is gated behind motion-safe so reduced-motion shows a static flow.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  class?: string;
+  /** compact = smaller, for inside device clusters */
+  size?: 'default' | 'compact';
+}
+const { class: className = '', size = 'default' } = Astro.props;
+
+const nodes = [
+  { icon: 'phone-back', label: 'New lead', sub: 'Missed call', accent: 'forge' },
+  { icon: 'bolt', label: 'Instant text-back', sub: 'Replied in 0:47', accent: 'circuit' },
+  { icon: 'pipeline', label: 'In pipeline', sub: 'Auto follow-up', accent: 'navy' },
+  { icon: 'calendar', label: 'Booked', sub: 'Confirmed', accent: 'green' },
+  { icon: 'star', label: 'Review', sub: '★★★★★', accent: 'forge' },
+];
+
+const chip: Record<string, string> = {
+  forge: 'bg-forge/10 text-forge ring-forge/20',
+  circuit: 'bg-circuit/10 text-circuit ring-circuit/20',
+  navy: 'bg-navy/5 text-navy ring-navy/15',
+  green: 'bg-[#28C840]/10 text-[#1FA34A] ring-[#28C840]/20',
+};
+const iconSize = size === 'compact' ? 20 : 26;
+---
+
+<div class={`cm-flow ${className}`} role="img" aria-label="How a lead flows through the system: new lead, instant text-back, pipeline, booked, review.">
+  <ol class="flex flex-col items-stretch gap-3 lg:flex-row lg:items-center lg:gap-0">
+    {
+      nodes.map((n, i) => (
+        <>
+          <li
+            class="cm-node flex items-center gap-3 rounded-2xl border border-hairline bg-white p-3.5 shadow-soft lg:flex-1 lg:flex-col lg:gap-2 lg:p-4 lg:text-center"
+            style={`--i:${i}`}
+          >
+            <span class={`relative grid place-items-center rounded-xl ring-1 ${chip[n.accent]} ${size === 'compact' ? 'h-10 w-10' : 'h-12 w-12'}`}>
+              <Icon name={n.icon as any} size={iconSize} />
+              <span class="cm-ring absolute inset-0 rounded-xl ring-2 ring-forge/40" aria-hidden="true" />
+            </span>
+            <span class="leading-tight">
+              <span class="block text-sm font-bold text-navy">{n.label}</span>
+              <span class="block text-xs text-cool">{n.sub}</span>
+            </span>
+          </li>
+          {i < nodes.length - 1 && (
+            <li class="cm-connector relative mx-auto h-6 w-px shrink-0 bg-hairline lg:h-px lg:w-10" aria-hidden="true">
+              <span class="cm-dot absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-forge lg:left-0 lg:top-1/2 lg:-translate-y-1/2" style={`--i:${i}`} />
+            </li>
+          )}
+        </>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  /* Sequential node entrance + pulse */
+  @media (prefers-reduced-motion: no-preference) {
+    .cm-node {
+      animation: node-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+      animation-delay: calc(var(--i) * 220ms);
+    }
+    .cm-ring {
+      opacity: 0;
+      animation: ring-pulse 3.6s ease-out infinite;
+      animation-delay: calc(var(--i) * 220ms + 600ms);
+    }
+    .cm-dot {
+      animation: dot-travel 3.6s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 220ms);
+    }
+  }
+
+  @keyframes node-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes ring-pulse {
+    0% { opacity: 0.7; transform: scale(1); }
+    18% { opacity: 0; transform: scale(1.35); }
+    100% { opacity: 0; transform: scale(1.35); }
+  }
+  /* dot travels vertically on mobile, horizontally on desktop */
+  @keyframes dot-travel {
+    0%, 100% { opacity: 0; transform: translateX(-50%) translateY(0); }
+    8% { opacity: 1; }
+    40%, 100% { opacity: 0; transform: translateX(-50%) translateY(1.5rem); }
+  }
+  @media (min-width: 1024px) {
+    @keyframes dot-travel {
+      0%, 100% { opacity: 0; transform: translateY(-50%) translateX(0); }
+      8% { opacity: 1; }
+      40%, 100% { opacity: 0; transform: translateY(-50%) translateX(2.5rem); }
+    }
+  }
+</style>

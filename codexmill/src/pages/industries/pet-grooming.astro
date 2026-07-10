@@ -1,0 +1,112 @@
+---
+/**
+ * PET GROOMING — CLAUDE.md §6.5 / copy deck Page 5.
+ * Signature: grooming-reminder chat thread + booking calendar; friendly, warm.
+ * Pricing: Fetch / Best in Show.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/Hero.astro';
+import PainPoints from '../../components/PainPoints.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import PricingTable from '../../components/PricingTable.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTASection from '../../components/CTASection.astro';
+import DeviceMock from '../../components/DeviceMock.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import BookingCalendar from '../../components/mocks/BookingCalendar.astro';
+import TextBackThread from '../../components/mocks/TextBackThread.astro';
+import { INDUSTRY_SUBTAGLINES } from '../../config/site';
+
+const pains = [
+  { icon: 'phone', title: 'Missed calls = lost bookings.', body: 'You’re mid-groom; the phone goes unanswered and they book elsewhere.' },
+  { icon: 'refresh', title: 'Pet parents forget to rebook.', body: 'Without a reminder, that 6-week groom becomes 6 months — or never.' },
+  { icon: 'calendar', title: 'No-shows leave gaps.', body: 'Empty slots you could’ve filled.' },
+  { icon: 'star', title: 'Great work, few reviews.', body: 'You’re not asking, so it’s not showing up online.' },
+];
+
+const steps = [
+  { label: 'Capture', title: 'Instant text-back', body: 'Missed calls and inquiries get an instant text back with a booking link.', icon: 'phone-back' },
+  { label: 'Confirm', title: 'Reminders cut no-shows', body: 'Automated reminders before every appointment cut no-shows.', icon: 'calendar' },
+  { label: 'Rebook', title: 'Grooming-cycle reminders', body: 'Recurring reminders on each pet’s grooming cycle keep them coming back.', icon: 'refresh' },
+  { label: 'Grow', title: 'Reviews, reactivation, campaigns', body: 'Auto review requests, reactivation, and seasonal campaigns.', icon: 'star', note: 'marketing on Best in Show' },
+];
+
+const faqs = [
+  { q: 'Does it track pets, not just owners?', a: 'Yes — owner + pet records, breed/service, and grooming cycle.' },
+  { q: 'Do I need tech skills?', a: 'No — it’s done-for-you.' },
+  { q: 'Do I own my client data?', a: 'Always.' },
+  { q: 'How fast can I start?', a: 'Within 7 working days with the base package and within 14 days for higher level packages.' },
+];
+
+const meta = {
+  title: 'Automation & Marketing for Pet Groomers | CodexMill',
+  description:
+    'Keep your grooming calendar full, cut no-shows, and bring clients back on schedule — done-for-you automation for pet groomers. Book a free audit.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    eyebrow="For Pet Grooming & Mobile Groomers"
+    headline="Keep the Calendar Full and the"
+    highlight="Tails Wagging."
+    subTagline={INDUSTRY_SUBTAGLINES['pet-grooming']}
+    subhead="CodexMill books appointments, sends reminders, and nudges pet parents to rebook on schedule — so you spend less time chasing and more time grooming."
+    secondaryLabel="See How It Works"
+  >
+    <div slot="visual" class="relative mx-auto max-w-xl">
+      <DeviceMock variant="browser" url="app.codexmill.com/grooming" float>
+        <BookingCalendar
+          title="Grooming Calendar"
+          appts={[
+            { time: '9:00', label: 'Buddy · full groom', accent: 'circuit' },
+            { time: '11:00', label: 'Luna · rebook', accent: 'forge' },
+            { time: '1:30', label: 'Max · nail trim', accent: 'green' },
+            { time: '3:00', label: 'New booking', accent: 'circuit' },
+          ]}
+        />
+      </DeviceMock>
+      <div class="absolute -bottom-8 right-0 hidden w-48 motion-safe:animate-float lg:block xl:-right-4 xl:w-56" style="animation-delay:-2s">
+        <DeviceMock variant="phone">
+          <TextBackThread
+            contactName="Pet parent · Sam"
+            status="Grooming-cycle reminder"
+            bubbles={[
+              { from: 'us', text: '🐾 Buddy’s due for a groom! It’s been about 6 weeks. Want to grab his usual spot?', meta: 'Recurring reminder' },
+              { from: 'them', text: 'Yes please! Saturday morning?' },
+              { from: 'us', text: '📅 Book Buddy’s groom', meta: 'Booking link' },
+            ]}
+          />
+        </DeviceMock>
+      </div>
+      <FloatingStat icon="refresh" label="Rebooked" value="Every cycle" accent="forge" class="absolute -left-3 top-8 hidden lg:flex" />
+      <FloatingStat icon="star" label="New review" value="★★★★★" accent="green" class="absolute -left-6 bottom-24 hidden lg:flex" style="animation-delay:-3s" />
+    </div>
+  </Hero>
+
+  <PainPoints
+    surface="white"
+    eyebrow="Where the bookings slip"
+    heading="The Gaps Costing You"
+    highlight="Grooms."
+    items={pains}
+  />
+
+  <HowItWorks heading="One System. Calendar" highlight="Always Full." steps={steps} class="bg-mist" />
+
+  <PricingTable
+    industryId="pet-grooming"
+    heading="Two Plans,"
+    highlight="Tail-Wag Approved."
+    subhead="Start with automation essentials, or add full marketing. Founder pricing available for the first 50 clients."
+  />
+
+  <FAQ heading="Pet Grooming" highlight="FAQ" items={faqs} schema />
+
+  <CTASection
+    heading="Keep Them Coming Back."
+    body="Book a free audit and we'll show you where bookings are slipping — and the system that keeps your calendar full and tails wagging."
+  />
+<Layout></Layout>
+</BaseLayout>

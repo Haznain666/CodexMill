@@ -1,0 +1,337 @@
+---
+/**
+ * SimpleScheduler — self-contained month calendar + time-slot picker.
+ * 
+ * MODES:
+ *   "captcha" (default): User picks Date+Time → Verify Human → CAPTCHA → auto-submits → thank-you
+ *   "picker":            User picks Date+Time only. NO buttons. Parent reads [data-slot-value].
+ */
+import Icon from '../Icon.astro';
+
+interface Props {
+  id?: string;
+  clientName?: string;
+  note?: string;
+  class?: string;
+  mode?: 'captcha' | 'picker';
+}
+const {
+  id = 'scheduler',
+  clientName = 'there',
+  note = "We'll reach out at the number/email you provided. If this time doesn't work out, we'll reach out to reschedule.",
+  class: className = '',
+  mode = 'captcha',
+} = Astro.props;
+---
+
+<div data-scheduler data-client-name={clientName} id={id} class={className} data-mode={mode}>
+  <!-- Calendar + slots -->
+  <div data-picker>
+    <!-- month header -->
+    <div class="flex items-center justify-between">
+      <button type="button" data-prev aria-label="Previous month" class="grid h-9 w-9 place-items-center rounded-lg border border-hairline text-navy transition hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40">
+        <Icon name="arrow-right" size={16} class="rotate-180" />
+      </button>
+      <p data-month-label class="font-display text-base font-bold text-navy"></p>
+      <button type="button" data-next-month aria-label="Next month" class="grid h-9 w-9 place-items-center rounded-lg border border-hairline text-navy transition hover:bg-mist">
+        <Icon name="arrow-right" size={16} />
+      </button>
+    </div>
+
+    <!-- weekday headers -->
+    <div class="mt-4 grid grid-cols-7 gap-1 text-center text-[0.7rem] font-semibold uppercase tracking-wide text-cool">
+      <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+    </div>
+
+    <!-- date grid (rendered by JS) -->
+    <div data-grid class="mt-1.5 grid grid-cols-7 gap-1"></div>
+
+    <!-- time slots (revealed after a date is picked) -->
+    <div data-slots-wrap class="mt-6 hidden">
+      <p class="text-sm font-bold text-navy">Pick a time <span data-slot-date class="font-medium text-slate"></span></p>
+      <div data-slots class="mt-3 flex flex-wrap justify-between gap-4"></div>
+    </div>
+
+    <p class="mt-5 text-xs leading-relaxed text-slate">{note}</p>
+
+    <!-- ===== CAPTCHA MODE: Verify Human → CAPTCHA → auto-submits ===== -->
+    <div data-captcha-actions class="mt-6 border-t border-hairline pt-5 hidden">
+      <div data-verify-area class="hidden text-right">
+        <button
+          type="button"
+          data-verify-human
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-ember px-6 py-2.5 font-semibold text-white shadow-soft transition hover:bg-ember-600 hover:shadow-glow"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          Verify Human
+        </button>
+        <p class="mt-2 text-xs text-slate">Complete verification to book</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thank-you state (CAPTCHA mode only) -->
+  <div data-thankyou class="hidden flex-col items-center py-6 text-center">
+    <span class="grid h-16 w-16 place-items-center rounded-full bg-forge-blue text-white shadow-glow">
+      <Icon name="check" size={32} weight={2.6} />
+    </span>
+    <h3 class="mt-5 font-display text-2xl font-extrabold text-navy">You're all set<span data-ty-name></span>!</h3>
+    <p data-ty-detail class="mt-3 max-w-md text-slate"></p>
+  </div>
+
+  <!-- Finalized value for parent to read -->
+  <input type="hidden" name="selectedCallSlot" data-slot-value />
+</div>
+
+<script>
+  const DEFAULT_SLOTS = [
+    { label: '8:00 AM', h: 8 },
+    { label: '9:00 AM', h: 9 },
+    { label: '10:00 AM', h: 10 },
+    { label: '11:00 AM', h: 11 },
+    { label: '12:00 PM', h: 12 },
+    { label: '1:00 PM', h: 13 },
+    { label: '2:00 PM', h: 14 },
+    { label: '3:00 PM', h: 15 },
+    { label: '4:00 PM', h: 16 },
+    { label: '5:00 PM', h: 17 },
+    { label: '6:00 PM', h: 18 },
+    { label: '7:00 PM', h: 19 },
+  ];
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const pad = (n) => String(n).padStart(2, '0');
+  const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  function initScheduler(root) {
+    if (root.dataset.schedInit) return;
+    root.dataset.schedInit = '1';
+
+    // Read the mode fresh every time it's needed, rather than caching it once here.
+    // The parent DiscoveryForm flips data-mode on this same element at runtime
+    // (e.g. 'captcha' when "Explore" is checked, 'picker' when it isn't), so the
+    // scheduler must not lock itself into whatever mode was present at first init.
+    const isCaptchaMode = () => (root.dataset.mode || 'captcha') === 'captcha';
+
+    const grid = root.querySelector('[data-grid]');
+    const monthLabel = root.querySelector('[data-month-label]');
+    const prevBtn = root.querySelector('[data-prev]');
+    const nextBtn = root.querySelector('[data-next-month]');
+    const slotsWrap = root.querySelector('[data-slots-wrap]');
+    const slotsBox = root.querySelector('[data-slots]');
+    const slotDateLabel = root.querySelector('[data-slot-date]');
+    const captchaActions = root.querySelector('[data-captcha-actions]');
+    const verifyArea = root.querySelector('[data-verify-area]');
+    const verifyBtn = root.querySelector('[data-verify-human]');
+    const hidden = root.querySelector('[data-slot-value]');
+    const picker = root.querySelector('[data-picker]');
+    const thankyou = root.querySelector('[data-thankyou]');
+
+    const today = startOfDay(new Date());
+    let viewY = today.getFullYear();
+    let viewM = today.getMonth();
+    let selected = null;
+    let slot = null;
+    let captchaVerified = false;
+    let isoValue = null;
+    let formattedValue = null;
+
+    // Parse time config from data-time-config attribute
+    let timeSlots = DEFAULT_SLOTS;
+    try {
+      const config = JSON.parse(root.dataset.timeConfig || '{}');
+      if (config.startHour !== undefined && config.endHour !== undefined) {
+        timeSlots = [];
+        for (let h = config.startHour; h <= config.endHour; h++) {
+          const period = h >= 12 ? 'PM' : 'AM';
+          const displayH = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+          timeSlots.push({ label: `${displayH}:00 ${period}`, h });
+        }
+      }
+    } catch (e) {
+      console.warn('Invalid time config, using defaults:', e);
+    }
+
+    const syncButtons = () => {
+      if (!isCaptchaMode()) {
+        // Picker mode has no CAPTCHA UI — force it hidden rather than leaving
+        // whatever visibility state a prior captcha-mode session left behind.
+        captchaActions.classList.add('hidden');
+        verifyArea.classList.add('hidden');
+        return;
+      }
+
+      const hasSelection = selected && slot;
+      if (!hasSelection || captchaVerified) {
+        // Once verified we auto-submit immediately (see scheduler:captcha-verified),
+        // so there's no intermediate "verified, waiting for submit" UI state to show.
+        captchaActions.classList.add('hidden');
+        verifyArea.classList.add('hidden');
+        return;
+      }
+
+      captchaActions.classList.remove('hidden');
+      verifyArea.classList.remove('hidden');
+    };
+
+    const pickSlot = (s, btn) => {
+      slot = s;
+      captchaVerified = false;
+      slotsBox.querySelectorAll('button').forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('bg-forge', on);
+        b.classList.toggle('text-white', on);
+        b.classList.toggle('border-forge', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      syncButtons();
+
+      // In picker mode, update hidden input and notify parent immediately
+      if (!isCaptchaMode() && selected && slot) {
+        isoValue = `${selected.getFullYear()}-${pad(selected.getMonth() + 1)}-${pad(selected.getDate())}T${pad(slot.h)}:00:00`;
+        hidden.value = isoValue;
+        const formattedDate = selected.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        formattedValue = `${formattedDate} at ${slot.label}`;
+      }
+    };
+
+    const renderSlots = () => {
+      slotsBox.innerHTML = '';
+      timeSlots.forEach((s) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = s.label;
+        b.setAttribute('aria-pressed', 'false');
+        b.className =
+          'rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-navy transition hover:border-forge/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge/30';
+        b.addEventListener('click', () => pickSlot(s, b));
+        slotsBox.appendChild(b);
+      });
+    };
+
+    const pickDate = (d) => {
+      selected = d;
+      slot = null;
+      captchaVerified = false;
+      renderGrid();
+      renderSlots();
+      slotsWrap.classList.remove('hidden');
+      slotDateLabel.textContent = `· ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+      syncButtons();
+
+      // In picker mode, reset hidden input
+      if (!isCaptchaMode()) {
+        hidden.value = '';
+      }
+    };
+
+    const renderGrid = () => {
+      monthLabel.textContent = `${MONTHS[viewM]} ${viewY}`;
+      prevBtn.disabled = viewY === today.getFullYear() && viewM === today.getMonth();
+      grid.innerHTML = '';
+      const firstDow = new Date(viewY, viewM, 1).getDay();
+      const days = new Date(viewY, viewM + 1, 0).getDate();
+      for (let i = 0; i < firstDow; i++) grid.appendChild(document.createElement('span'));
+      for (let day = 1; day <= days; day++) {
+        const d = new Date(viewY, viewM, day);
+        const isPast = d < today;
+        const isToday = d.getTime() === today.getTime();
+        const isSel = selected && d.getTime() === selected.getTime();
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.textContent = String(day);
+        cell.disabled = isPast;
+        cell.setAttribute('aria-label', `${MONTHS[viewM]} ${day}, ${viewY}`);
+        cell.setAttribute('aria-pressed', String(Boolean(isSel)));
+        cell.className = [
+          'grid h-10 place-items-center rounded-lg text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge/40',
+          isPast ? 'cursor-not-allowed text-cool/40' : 'text-navy hover:bg-mist',
+          isSel ? 'bg-forge font-bold text-white hover:bg-forge' : '',
+          isToday && !isSel ? 'font-bold ring-1 ring-forge/40' : '',
+        ].join(' ');
+        if (!isPast) cell.addEventListener('click', () => pickDate(d));
+        grid.appendChild(cell);
+      }
+    };
+
+    prevBtn.addEventListener('click', () => {
+      if (prevBtn.disabled) return;
+      viewM--; if (viewM < 0) { viewM = 11; viewY--; }
+      renderGrid();
+    });
+    nextBtn.addEventListener('click', () => {
+      viewM++; if (viewM > 11) { viewM = 0; viewY++; }
+      renderGrid();
+    });
+
+    // ===== CAPTCHA MODE ONLY: Verify Human button =====
+    if (verifyBtn) {
+      verifyBtn.addEventListener('click', () => {
+        if (!isCaptchaMode() || !selected || !slot) return;
+
+        isoValue = `${selected.getFullYear()}-${pad(selected.getMonth() + 1)}-${pad(selected.getDate())}T${pad(slot.h)}:00:00`;
+        hidden.value = isoValue;
+        const formattedDate = selected.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        formattedValue = `${formattedDate} at ${slot.label}`;
+
+        // Tell parent to show CAPTCHA popup
+        root.dispatchEvent(new CustomEvent('scheduler:verify', { 
+          bubbles: true, 
+          detail: { 
+            iso: isoValue, 
+            formatted: formattedValue,
+            schedulerId: root.id
+          }
+        }));
+      });
+    }
+
+    // ===== CAPTCHA MODE ONLY: CAPTCHA verified → auto-submit immediately =====
+    root.addEventListener('scheduler:captcha-verified', () => {
+      if (!isCaptchaMode() || !selected || !slot) return;
+      captchaVerified = true;
+      syncButtons();
+
+      // Personalised thank-you
+      const name = (root.dataset.clientName || 'there').trim();
+      root.querySelector('[data-ty-name]').textContent = name && name !== 'there' ? `, ${name}` : '';
+      root.querySelector('[data-ty-detail]').textContent = `We'll reach out on ${formattedValue}. Talk soon!`;
+      picker.classList.add('hidden');
+      thankyou.classList.remove('hidden');
+      thankyou.classList.add('flex');
+
+      // Notify parent of final submission
+      root.dispatchEvent(new CustomEvent('scheduler:submit', {
+        bubbles: true,
+        detail: {
+          iso: isoValue,
+          formatted: formattedValue,
+          schedulerId: root.id
+        }
+      }));
+    });
+
+    // ===== Reset all scheduling + CAPTCHA state (e.g. contact method changed away
+    // from Phone Call on Step 1, so this scheduler is no longer part of the flow) =====
+    root.addEventListener('scheduler:reset', () => {
+      selected = null;
+      slot = null;
+      captchaVerified = false;
+      isoValue = null;
+      formattedValue = null;
+      if (hidden) hidden.value = '';
+      slotsWrap.classList.add('hidden');
+      captchaActions.classList.add('hidden');
+      verifyArea.classList.add('hidden');
+      picker.classList.remove('hidden');
+      thankyou.classList.add('hidden');
+      thankyou.classList.remove('flex');
+      renderGrid();
+    });
+
+    renderGrid();
+  }
+
+  document.querySelectorAll('[data-scheduler]').forEach(initScheduler);
+</script>

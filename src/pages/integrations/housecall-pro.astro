@@ -1,0 +1,570 @@
+---
+/**
+ * INTEGRATIONS · HOUSECALL PRO + GOHIGHLEVEL
+ * Signature: two-app sync flow (Housecall Pro ↔ GHL) plus a cursor trail.
+ * Copy is CodexMill voice — owner-to-owner, outcome-first. Placeholder logos
+ * and metrics stay labeled per CLAUDE.md §9.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import PainPoints from '../../components/PainPoints.astro';
+import FeatureGrid from '../../components/FeatureGrid.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import CTASection from '../../components/CTASection.astro';
+import FAQ from '../../components/FAQ.astro';
+import IntegrationProcess from '../../components/IntegrationProcess.astro';
+import IntegrationTestimonials from '../../components/IntegrationTestimonials.astro';
+import IntegrationsOtherRow from '../../components/IntegrationsOtherRow.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import GlassCard from '../../components/GlassCard.astro';
+import Icon from '../../components/Icon.astro';
+import Button from '../../components/Button.astro';
+import DeviceMock from '../../components/DeviceMock.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import IntegrationSyncFlow from '../../components/mocks/IntegrationSyncFlow.astro';
+import { GET_STARTED_URL, CTA_LABEL } from '../../config/site';
+
+const meta = {
+  title: 'Housecall Pro + GoHighLevel Integration | CodexMill',
+  description:
+    'A done-for-you Housecall Pro + GoHighLevel integration. Jobs, customers, and invoices sync in real time so your team runs one pipeline — not two systems.',
+};
+
+const pains = [
+  {
+    icon: 'users',
+    title: 'Customer records live in two places',
+    body: 'Every new Housecall Pro customer needs a matching CRM record, or your follow-up misses them entirely.',
+  },
+  {
+    icon: 'phone-back',
+    title: 'Missed calls never turn into jobs',
+    body: 'Field techs are on the truck. Calls slip. Without a text-back trigger, that lead is gone.',
+  },
+  {
+    icon: 'refresh',
+    title: 'Nobody rebooks lapsed customers',
+    body: 'Maintenance-plan clients drop off and no one runs a reactivation sequence to bring them back.',
+  },
+  {
+    icon: 'star',
+    title: 'Review asks depend on someone remembering',
+    body: 'The job wraps, the tech leaves, the review never gets requested. Reputation stalls.',
+  },
+  {
+    icon: 'inbox',
+    title: 'Estimates sit without follow-up',
+    body: 'A quote goes out, silence follows, and nobody nudges it. The competitor who did wins.',
+  },
+  {
+    icon: 'chart',
+    title: 'No single view of the pipeline',
+    body: 'Ops sees the jobs board, marketing sees the CRM, and the two never agree on the number.',
+  },
+];
+
+const automations = [
+  {
+    icon: 'phone-back',
+    title: 'New customer → CRM contact',
+    body: 'The moment a customer is created in Housecall Pro, a matching CRM contact is built and tagged for the right nurture path.',
+  },
+  {
+    icon: 'workflow',
+    title: 'Estimate sent → follow-up sequence',
+    body: 'An estimate leaves your ops tool and a multi-step email + SMS sequence starts until the customer replies, books, or opts out.',
+  },
+  {
+    icon: 'calendar',
+    title: 'Job scheduled → confirmations & reminders',
+    body: 'When a job lands on the schedule, we fire the confirmation, the reminder, and the "on the way" text automatically.',
+  },
+  {
+    icon: 'pipeline',
+    title: 'Job status → pipeline stage',
+    body: 'Every status change in the field pushes the opportunity to the correct stage in your CRM — no manual dragging.',
+  },
+  {
+    icon: 'star',
+    title: 'Job completed → review request',
+    body: 'The instant a job closes out, the review request goes out to Google, Facebook, or wherever your reputation needs weight.',
+  },
+  {
+    icon: 'refresh',
+    title: 'Lapsed customer → reactivation',
+    body: 'Customers who haven\'t booked in the window you define drop into a reactivation flow with an incentive to come back.',
+  },
+];
+
+const syncedFields = {
+  left: {
+    title: 'Housecall Pro',
+    kicker: 'Field ops · Scheduling',
+    fields: [
+      { icon: 'users', label: 'Customers & contact details' },
+      { icon: 'calendar', label: 'Jobs & scheduled visits' },
+      { icon: 'form', label: 'Estimates & line items' },
+      { icon: 'chart', label: 'Invoices & payment status' },
+      { icon: 'workflow', label: 'Job statuses & tech notes' },
+    ],
+  },
+  right: {
+    title: 'GoHighLevel',
+    kicker: 'CRM · Automation · Marketing',
+    fields: [
+      { icon: 'users', label: 'CRM contacts & tags' },
+      { icon: 'pipeline', label: 'Pipelines & opportunities' },
+      { icon: 'chat', label: 'SMS + email conversations' },
+      { icon: 'star', label: 'Review requests & responses' },
+      { icon: 'refresh', label: 'Reactivation & nurture flows' },
+    ],
+  },
+};
+
+const steps = [
+  {
+    label: 'Capture',
+    title: 'Every lead lands in one place',
+    body: 'Web forms, ad clicks, calls, and Housecall Pro entries all end up as tagged CRM contacts — no lead lives in a silo.',
+    icon: 'phone-back',
+  },
+  {
+    label: 'Follow up',
+    title: 'Sequences run without you',
+    body: 'The right email + SMS cadence fires based on the job status — from cold quote to booked appointment.',
+    icon: 'bolt',
+  },
+  {
+    label: 'Book',
+    title: 'Confirmations + reminders on autopilot',
+    body: 'Every scheduled job gets its confirmation, its reminder, and its route to reduce no-shows without a call from the office.',
+    icon: 'calendar',
+  },
+  {
+    label: 'Grow',
+    title: 'Reviews and rebooking, automatically',
+    body: 'Job wraps up, the review ask goes out, and lapsed customers are put back into a reactivation flow to fill the calendar.',
+    icon: 'trending-up',
+  },
+];
+
+const faqs = [
+  {
+    q: 'Will this break how our techs already use Housecall Pro?',
+    a: 'No. The field team keeps doing what they do inside Housecall Pro. The integration runs in the background — it just makes sure the CRM, the automations, and the marketing side stay in perfect sync with what the ops side is doing.',
+  },
+  {
+    q: 'Does the data sync in real time or on a schedule?',
+    a: 'Real time in both directions for the moments that matter — new customers, job status changes, invoice paid events. For heavier bulk syncs (historical data, backfill) we run it once during onboarding.',
+  },
+  {
+    q: 'Do we need a specific tier of GoHighLevel or Housecall Pro?',
+    a: 'Standard subscriptions on both platforms are usually enough. We\'ll confirm on the discovery call after we look at exactly which events and objects your workflow needs to touch.',
+  },
+  {
+    q: 'How long does the build take?',
+    a: 'Most Housecall Pro integrations are live in one to two weeks. That includes discovery, field mapping, build, testing on real records, and turning it on with your team.',
+  },
+  {
+    q: 'What if we already have workflows in GHL?',
+    a: 'We audit them first. If they\'re working, we wire the integration into them. If they\'re broken or half-built, we clean them up as part of the project — no orphaned automations left running in the background.',
+  },
+  {
+    q: 'What ongoing support do we get?',
+    a: 'You get support on the integration itself for as long as you\'re a CodexMill client. If Housecall Pro or GHL push changes that affect the sync, we adjust it — you don\'t.',
+  },
+];
+
+const capturedMetrics = [
+  { label: 'Systems unified', value: '2 → 1' },
+  { label: 'Sync latency', value: 'Real-time' },
+  { label: 'Build window', value: '1–2 weeks' },
+  { label: 'Manual double-entry', value: 'Eliminated' },
+];
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+
+  <!-- =================== HERO =================== -->
+  <Hero
+    eyebrow="Integrations · Housecall Pro"
+    headline="Run Housecall Pro and GHL as"
+    highlight="One System."
+    subhead="We build a done-for-you two-way sync between Housecall Pro and GoHighLevel — so jobs, customers, invoices, and follow-up all live in one pipeline instead of two."
+    trustLine="Done-for-you setup · Real-time sync · Built and maintained by CodexMill"
+    secondaryLabel="See what we sync"
+    secondaryHref="#what-we-sync"
+  >
+    <div slot="visual" class="relative mx-auto max-w-lg">
+      <IntegrationSyncFlow leftLabel="Housecall Pro" leftAccent="circuit" />
+      <FloatingStat icon="bolt" label="Reply time" value="0:47" accent="forge" class="absolute -left-4 -top-3 hidden lg:flex" />
+      <FloatingStat icon="star" label="Reviews" value="5.0" accent="circuit" class="absolute -right-4 bottom-2 hidden lg:flex" style="animation-delay:-2.5s" />
+    </div>
+  </Hero>
+
+  <!-- Metrics strip under hero -->
+  <section class="border-y border-hairline bg-white">
+    <div class="container-page grid grid-cols-2 gap-6 py-8 sm:py-10 md:grid-cols-4">
+      {
+        capturedMetrics.map((m, i) => (
+          <SectionReveal delay={i * 80} class="text-center">
+            <p class="font-display text-2xl font-extrabold text-navy sm:text-3xl">{m.value}</p>
+            <p class="mt-1 text-xs font-semibold uppercase tracking-widest text-cool">{m.label}</p>
+          </SectionReveal>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- =================== PROBLEM =================== -->
+  <PainPoints
+    surface="mist"
+    eyebrow="The chaos we remove"
+    heading="The Gaps That Cost You"
+    highlight="Jobs Every Week."
+    subhead="If Housecall Pro and GHL aren't talking, work slips through the seams. Here's where it usually leaks — and what we install to plug it."
+    items={pains}
+  />
+
+  <!-- Under the pain grid — a punchy summary CTA -->
+  <section class="bg-mist">
+    <div class="container-page pb-16 sm:pb-20">
+      <SectionReveal>
+        <div class="mx-auto max-w-3xl rounded-2xl border border-hairline bg-white p-8 text-center shadow-soft">
+          <p class="font-display text-xl font-bold text-navy sm:text-2xl">
+            You don't have a lead problem. You have a <span class="text-gradient">follow-up problem.</span>
+          </p>
+          <p class="mt-3 text-slate">Let's map exactly where jobs are leaking today and what it's worth to close those gaps.</p>
+          <div class="mt-6 flex justify-center">
+            <Button href={GET_STARTED_URL} size="lg">{CTA_LABEL}</Button>
+          </div>
+        </div>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <!-- =================== HOW IT WORKS =================== -->
+  <HowItWorks
+    heading="From First Call to"
+    highlight="Repeat Customer."
+    subhead="One connected system doing four things end-to-end, without your team touching a handoff."
+    steps={steps}
+  />
+
+  <!-- Split checklist under HowItWorks -->
+  <section class="bg-mist py-16 sm:py-20">
+    <div class="container-page grid gap-10 lg:grid-cols-2">
+      <SectionReveal>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Before CodexMill</p>
+        <h3 class="mt-3 font-display text-2xl font-bold text-navy sm:text-3xl">The old way</h3>
+        <ul class="mt-6 space-y-3">
+          {
+            [
+              'Techs enter jobs, marketing enters contacts — same customer, two records.',
+              'Follow-up is whoever remembers, whenever they get a minute.',
+              'Nobody chases the estimates that go quiet.',
+              'Review asks depend on the person who closed the job.',
+              'Lapsed customers never come back on their own.',
+            ].map((t) => (
+              <li class="flex items-start gap-3 text-slate">
+                <span class="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-hairline text-cool">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19" /></svg>
+                </span>
+                <span>{t}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </SectionReveal>
+      <SectionReveal delay={120}>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">With the integration live</p>
+        <h3 class="mt-3 font-display text-2xl font-bold text-navy sm:text-3xl">The new way</h3>
+        <ul class="mt-6 space-y-3">
+          {
+            [
+              'One customer, one record — synced in real time between both systems.',
+              'Every stage of the job triggers the right follow-up automatically.',
+              'Silent estimates get chased on a proven cadence.',
+              'Review requests fire the instant the job closes out.',
+              'Old customers drop into reactivation sequences without a human in the loop.',
+            ].map((t) => (
+              <li class="flex items-start gap-3 font-medium text-navy">
+                <Icon name="check" size={20} class="mt-0.5 text-forge" weight={2.6} />
+                <span>{t}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <!-- =================== AUTOMATIONS GRID =================== -->
+  <FeatureGrid
+    surface="white"
+    columns={3}
+    eyebrow="Battle-tested automations"
+    heading="Housecall Pro + GHL,"
+    highlight="Wired for Growth."
+    subhead="These are the flows we install on nearly every Housecall Pro build. Every one has a business outcome tied to it — not just a workflow diagram."
+    items={automations}
+  />
+
+  <!-- =================== NAVY CTA BAND =================== -->
+  <section class="bg-navy py-16 sm:py-20">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/[0.04] p-10 text-center backdrop-blur-sm">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-forge-500">Stop the double-entry</p>
+        <h2 class="mt-3 font-display text-3xl font-extrabold text-white sm:text-4xl">
+          Two tools. One system. <span class="text-gradient">Zero handoffs.</span>
+        </h2>
+        <p class="mt-4 text-white/70">
+          Book a free audit and we'll show you exactly where Housecall Pro and GHL are drifting today — and what a clean integration is worth to your calendar this quarter.
+        </p>
+        <div class="mt-8 flex justify-center">
+          <Button href={GET_STARTED_URL} size="lg">{CTA_LABEL}</Button>
+        </div>
+        <p class="mt-4 text-xs text-white/50">45-minute discovery call · No cost · No commitment</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== SYNC GRID =================== -->
+  <section id="what-we-sync" class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Data sync"
+          heading="Every Record That Matters,"
+          highlight="Both Ways."
+          subhead="The moment something changes on one side, the other side sees it — customers, jobs, estimates, invoices, and the events that trigger your automations."
+        />
+      </SectionReveal>
+
+      <div class="mt-14 grid gap-6 lg:grid-cols-2">
+        {
+          [syncedFields.left, syncedFields.right].map((col, idx) => (
+            <SectionReveal delay={idx * 120}>
+              <GlassCard class="h-full p-8">
+                <div class="flex items-center gap-3">
+                  <span class={`grid h-11 w-11 place-items-center rounded-xl ${idx === 0 ? 'bg-circuit/10 text-circuit' : 'bg-forge/10 text-forge'}`}>
+                    <Icon name="layers" size={22} />
+                  </span>
+                  <div>
+                    <p class="font-display text-xl font-bold text-navy">{col.title}</p>
+                    <p class="text-xs font-medium uppercase tracking-widest text-cool">{col.kicker}</p>
+                  </div>
+                </div>
+                <ul class="mt-6 space-y-3">
+                  {
+                    col.fields.map((f) => (
+                      <li class="flex items-center gap-3 rounded-xl bg-mist px-4 py-3 text-navy ring-1 ring-hairline">
+                        <span class={`grid h-8 w-8 place-items-center rounded-lg ${idx === 0 ? 'bg-circuit/10 text-circuit' : 'bg-forge/10 text-forge'}`}>
+                          <Icon name={f.icon as any} size={18} />
+                        </span>
+                        <span class="font-medium">{f.label}</span>
+                        <span class="ml-auto text-xs font-semibold text-cool">Live</span>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </GlassCard>
+            </SectionReveal>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== PROCESS =================== -->
+  <IntegrationProcess subhead="A predictable, six-stage build. No surprise sprints, no vague scope, no half-finished automations left running." />
+
+  <!-- =================== WHAT WORKS TOGETHER =================== -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Better together"
+          heading="What Housecall Pro Does Best,"
+          highlight="Amplified by GHL."
+          subhead="Two strong tools, each doing what they're built for — connected so their strengths compound instead of collide."
+        />
+      </SectionReveal>
+
+      <div class="mt-14 grid gap-6 lg:grid-cols-2">
+        <SectionReveal>
+          <GlassCard class="h-full p-8" hover>
+            <div class="flex items-center gap-3">
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-circuit/10 text-circuit">
+                <Icon name="workflow" size={22} />
+              </span>
+              <p class="font-display text-xl font-bold text-navy">Housecall Pro handles the field</p>
+            </div>
+            <ul class="mt-6 space-y-3">
+              {
+                [
+                  'Job scheduling and dispatch',
+                  'Estimates, invoices, and payment',
+                  'Route optimization and time tracking',
+                  'Technician-facing mobile experience',
+                ].map((t) => (
+                  <li class="flex items-center gap-2.5 font-medium text-navy">
+                    <Icon name="check" size={18} class="text-circuit" weight={2.4} />
+                    {t}
+                  </li>
+                ))
+              }
+            </ul>
+          </GlassCard>
+        </SectionReveal>
+        <SectionReveal delay={120}>
+          <GlassCard class="h-full p-8" hover>
+            <div class="flex items-center gap-3">
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-forge/10 text-forge">
+                <Icon name="megaphone" size={22} />
+              </span>
+              <p class="font-display text-xl font-bold text-navy">GHL handles the growth</p>
+            </div>
+            <ul class="mt-6 space-y-3">
+              {
+                [
+                  'CRM, pipeline, and lead source attribution',
+                  'Automated SMS + email follow-up sequences',
+                  'Review requests and reputation management',
+                  'Reactivation and long-cycle nurture flows',
+                ].map((t) => (
+                  <li class="flex items-center gap-2.5 font-medium text-navy">
+                    <Icon name="check" size={18} class="text-forge" weight={2.4} />
+                    {t}
+                  </li>
+                ))
+              }
+            </ul>
+          </GlassCard>
+        </SectionReveal>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== TESTIMONIALS =================== -->
+  <IntegrationTestimonials
+    eyebrow="What owners are saying"
+    heading="Placeholder reviews from"
+    highlight="Housecall Pro operators."
+  />
+
+  <!-- =================== WHY CODEXMILL =================== -->
+  <section class="bg-mist py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Why owners pick CodexMill"
+          heading="Built by Operators,"
+          highlight="Not Marketers."
+        />
+      </SectionReveal>
+
+      <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          [
+            { icon: 'shield', title: 'Certified GHL partner', body: 'We live inside GoHighLevel every day — no learning on your dime.' },
+            { icon: 'workflow', title: 'Housecall Pro depth', body: 'We know the object model, the API limits, and the field-team quirks.' },
+            { icon: 'sparkles', title: 'Custom to your ops', body: 'No templated integration. Your workflow, your fields, your pipeline stages.' },
+            { icon: 'clock', title: 'Delivered in weeks', body: 'Discovery to live sync typically inside a two-week window.' },
+            { icon: 'chart', title: 'Metrics we care about', body: 'Fewer missed follow-ups, higher rebooking rate, faster review velocity.' },
+            { icon: 'refresh', title: 'Ongoing support', body: 'When either platform changes, we update the integration — not you.' },
+          ].map((c, i) => (
+            <SectionReveal delay={(i % 3) * 90}>
+              <GlassCard class="h-full p-6" hover>
+                <span class="grid h-11 w-11 place-items-center rounded-xl bg-forge-blue-soft text-navy ring-1 ring-hairline">
+                  <Icon name={c.icon as any} size={22} />
+                </span>
+                <p class="mt-4 font-display text-lg font-bold text-navy">{c.title}</p>
+                <p class="mt-1.5 text-[0.95rem] leading-relaxed text-slate">{c.body}</p>
+              </GlassCard>
+            </SectionReveal>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== FAQ =================== -->
+  <FAQ
+    heading="Common questions,"
+    highlight="answered."
+    items={faqs}
+    schema
+  />
+
+  <!-- =================== FINAL BOOK CTA =================== -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <div class="grid gap-10 rounded-3xl border border-hairline bg-mist p-8 shadow-soft sm:p-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <SectionReveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Ready to sync</p>
+          <h2 class="mt-3 font-display text-3xl font-extrabold text-navy sm:text-4xl">
+            Let's plug Housecall Pro into <span class="text-gradient">GHL properly.</span>
+          </h2>
+          <p class="mt-4 text-slate">
+            Book a free 45-minute audit. We'll look at how you're using both platforms today, show you the exact leaks between them, and scope the integration on the call — no pressure, no proposal PDF nobody reads.
+          </p>
+          <ul class="mt-6 space-y-3">
+            {
+              [
+                'A quick walkthrough of your current Housecall Pro + GHL setup',
+                'A mapped-out list of what will sync and what will trigger',
+                'A one-page scope with pricing and a realistic go-live date',
+              ].map((t) => (
+                <li class="flex items-start gap-2.5 font-medium text-navy">
+                  <Icon name="check" size={20} class="mt-0.5 text-forge" weight={2.6} />
+                  <span>{t}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <Button href={GET_STARTED_URL} size="lg">{CTA_LABEL}</Button>
+            <p class="text-xs text-cool">Real humans on the line — not a bot funnel.</p>
+          </div>
+        </SectionReveal>
+
+        <SectionReveal delay={120}>
+          <GlassCard class="p-6 sm:p-8">
+            <p class="font-display text-lg font-bold text-navy">On the call, we'll cover:</p>
+            <div class="mt-5 space-y-3">
+              {
+                [
+                  { icon: 'search', t: 'Audit — where jobs are leaking today' },
+                  { icon: 'workflow', t: 'Design — what to sync and what to automate' },
+                  { icon: 'chart', t: 'Impact — what it\'s worth this quarter' },
+                  { icon: 'calendar', t: 'Timeline — go-live in one to two weeks' },
+                ].map((it) => (
+                  <div class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 ring-1 ring-hairline">
+                    <span class="grid h-9 w-9 place-items-center rounded-lg bg-forge-blue-soft text-navy ring-1 ring-hairline">
+                      <Icon name={it.icon as any} size={20} />
+                    </span>
+                    <span class="font-medium text-navy">{it.t}</span>
+                  </div>
+                ))
+              }
+            </div>
+            <div class="mt-6 rounded-xl bg-forge/5 p-4 text-sm text-slate ring-1 ring-forge/15">
+              <span class="font-semibold text-navy">Founder Member note:</span> if you qualify for our Home Services base plan, this integration can be bundled — ask about it on the call.
+            </div>
+          </GlassCard>
+        </SectionReveal>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== OTHER INTEGRATIONS =================== -->
+  <IntegrationsOtherRow currentSlug="housecall-pro" />
+
+  <!-- =================== CLOSING NAVY CTA =================== -->
+  <CTASection
+    heading="One System. Everything Connected."
+    body="Stop bridging Housecall Pro and GHL by hand. Book a free audit and we'll show you what a clean, done-for-you integration is worth to your calendar."
+  />
+</BaseLayout>

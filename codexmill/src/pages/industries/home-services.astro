@@ -1,0 +1,135 @@
+---
+/**
+ * HOME SERVICES — CLAUDE.md §6.3 / copy deck Page 3.
+ * Signature: jobs-pipeline dashboard + calendar + HVAC text-back phone.
+ * Pricing: Launchpad / Momentum / Pinnacle.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/Hero.astro';
+import PainPoints from '../../components/PainPoints.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import PricingTable from '../../components/PricingTable.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTASection from '../../components/CTASection.astro';
+import DeviceMock from '../../components/DeviceMock.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import Icon from '../../components/Icon.astro';
+import PipelineDashboard from '../../components/mocks/PipelineDashboard.astro';
+import TextBackThread from '../../components/mocks/TextBackThread.astro';
+import { INDUSTRY_SUBTAGLINES } from '../../config/site';
+
+const pains = [
+  { icon: 'phone', title: 'The call you couldn’t take.', body: 'Up a ladder or under a unit? It goes to voicemail — and most homeowners just dial the next company.' },
+  { icon: 'clock', title: 'The estimate that went cold.', body: 'You sent the quote and got busy. They hired whoever followed up.' },
+  { icon: 'inbox', title: 'The chaos you carry.', body: 'Leads on sticky notes, customers never called again, reviews never requested.' },
+];
+
+const steps = [
+  { label: 'Capture', title: 'Missed-call text-back', body: 'Every missed call gets an instant text back with a booking link — before they call the next company.', icon: 'phone-back' },
+  { label: 'Follow Up', title: 'Estimate follow-up', body: 'Quotes get followed up automatically until the job is won or the homeowner bows out.', icon: 'refresh' },
+  { label: 'Book & Confirm', title: 'Appointment reminders', body: 'Jobs booked, confirmed, and reminded — fewer no-shows, a fuller schedule.', icon: 'calendar' },
+  { label: 'Grow', title: 'Reviews & reactivation', body: 'Auto review requests post-job, plus reactivation that brings past customers back.', icon: 'star' },
+];
+
+const faqs = [
+  { q: 'What platform is this on?', a: 'GoHighLevel, set up and managed for you.' },
+  { q: 'Do I need tech skills?', a: 'No — it’s fully done-for-you.' },
+  { q: 'How fast can I start?', a: 'Within 7 working days with the base package and within 14 days for higher level packages.' },
+  { q: 'Am I locked in?', a: '[CONFIRM terms].' },
+  { q: 'Do I own my leads?', a: 'Your lead and customers are always yours. ' },
+];
+
+const meta = {
+  title: 'Automation for HVAC, Roofing & Lawn Care | CodexMill',
+  description:
+    'Capture every call, follow up automatically, and book more jobs. Done-for-you automation and marketing for home-service businesses. Book a free audit.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+
+  <Hero
+    eyebrow="For HVAC · Roofing · Lawn Mowing & Home Services"
+    headline="Every Missed Call Is a Job You Just"
+    highlight="Gave Away."
+    subTagline={INDUSTRY_SUBTAGLINES['home-services']}
+    subhead="CodexMill answers, follows up, and books for you — so you stop losing work to the company that picked up first."
+    secondaryLabel="See How It Works"
+  >
+    <div slot="visual" class="relative mx-auto max-w-xl">
+      <DeviceMock variant="laptop" url="app.codexmill.com/jobs" float>
+        <PipelineDashboard
+          title="Jobs Pipeline"
+          metrics={[
+            { label: 'New calls', value: '17', accent: 'circuit' },
+            { label: 'Jobs booked', value: '38', accent: 'green' },
+            { label: 'Revenue', value: '$61k', accent: 'forge' },
+          ]}
+          columns={[{ name: 'New', count: 4 }, { name: 'Quoted', count: 3 }, { name: 'Scheduled', count: 5 }]}
+        />
+      </DeviceMock>
+      <div class="absolute -bottom-8 right-0 hidden w-48 motion-safe:animate-float lg:block xl:-right-4 xl:w-56" style="animation-delay:-2s">
+        <DeviceMock variant="phone">
+          <TextBackThread
+            contactName="Homeowner · (555) 0142"
+            bubbles={[
+              { from: 'them', text: 'Missed call', meta: 'Missed call · just now' },
+              { from: 'us', text: "Hi! Sorry we missed you — this is the team. Need a repair or a quote? Reply here and we'll get you on the schedule.", meta: 'Auto-reply · 0:47' },
+              { from: 'them', text: 'AC not cooling — can someone come this week?' },
+              { from: 'us', text: '📅 Book your visit', meta: 'Booking link' },
+            ]}
+          />
+        </DeviceMock>
+      </div>
+      <FloatingStat icon="phone-back" label="Missed call" value="Texted back" accent="green" class="absolute -left-3 top-8 hidden lg:flex" />
+      <FloatingStat icon="calendar" label="Jobs booked" value="38" accent="circuit" class="absolute -left-6 bottom-24 hidden lg:flex" style="animation-delay:-3s" />
+    </div>
+  </Hero>
+
+  <!-- Who it's for -->
+  <section class="bg-white py-14">
+    <div class="container-page">
+      <SectionReveal class="mx-auto max-w-3xl text-center">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Who it’s for</p>
+        <p class="mt-4 text-xl leading-relaxed text-slate">
+          Built for HVAC and roofing companies, lawn and landscaping crews, and the home-service
+          trades that live and die by the phone — <span class="font-semibold text-navy">plumbing, electrical, cleaning, and more.</span>
+        </p>
+        <div class="mt-7 flex flex-wrap justify-center gap-2.5">
+          {['HVAC', 'Roofing', 'Lawn & Landscaping', 'Plumbing', 'Electrical', 'Cleaning'].map((t) => (
+            <span class="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-mist px-3.5 py-1.5 text-sm font-medium text-navy">
+              <Icon name="check" size={14} class="text-forge" weight={2.6} />{t}
+            </span>
+          ))}
+        </div>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <PainPoints
+    surface="mist"
+    eyebrow="Where the money leaks"
+    heading="Sound"
+    highlight="Familiar?"
+    items={pains}
+  />
+
+  <HowItWorks heading="One System. Every Call," highlight="Handled." steps={steps} />
+
+  <PricingTable
+    industryId="home-services"
+    heading="Pick the System That Fits"
+    highlight="Where You Are."
+    subhead="Start by plugging the leaks. Scale when you're ready. Founder pricing available for the first 50 clients."
+  />
+
+  <FAQ heading="Home Services" highlight="FAQ" items={faqs} schema />
+
+  <CTASection
+    heading="Stop Giving Away Jobs."
+    body="Book a free audit and we'll show you exactly where calls and quotes are slipping through — and the system that fixes it."
+  />
+  <Layout></Layout>
+</BaseLayout>

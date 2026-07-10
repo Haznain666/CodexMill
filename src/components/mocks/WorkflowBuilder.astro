@@ -1,0 +1,77 @@
+---
+/**
+ * WorkflowBuilder — stylised (NOT real-product) GHL-style automation builder:
+ * a trigger node connected down through action nodes, with a lead "flowing"
+ * along the path. For the Automation page signature.
+ */
+import Icon from '../Icon.astro';
+
+const nodes = [
+  { icon: 'phone-back', label: 'Trigger', sub: 'Missed call', accent: 'forge' },
+  { icon: 'bolt', label: 'Action', sub: 'Send text-back', accent: 'circuit' },
+  { icon: 'refresh', label: 'Action', sub: 'Follow-up sequence', accent: 'circuit' },
+  { icon: 'calendar', label: 'Action', sub: 'Booking link', accent: 'green' },
+  { icon: 'star', label: 'Action', sub: 'Request review', accent: 'forge' },
+];
+const chip: Record<string, string> = {
+  forge: 'bg-forge/10 text-forge ring-forge/25',
+  circuit: 'bg-circuit/10 text-circuit ring-circuit/25',
+  green: 'bg-[#28C840]/10 text-[#1FA34A] ring-[#28C840]/25',
+};
+---
+
+<div class="relative space-y-0 p-6">
+  <div class="mb-4 flex items-center justify-between">
+    <p class="font-display text-sm font-bold text-navy">Automation · Missed-Call Recovery</p>
+    <span class="rounded-full bg-[#28C840]/10 px-2.5 py-1 text-[0.65rem] font-bold text-[#1FA34A]">Live</span>
+  </div>
+
+  <div class="relative">
+    <!-- vertical connector -->
+    <div class="absolute left-[1.55rem] top-6 bottom-6 w-px bg-hairline" aria-hidden="true">
+      <span class="cm-flow-dot absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-forge shadow-glow"></span>
+    </div>
+
+    <ol class="relative space-y-3">
+      {
+        nodes.map((n, i) => (
+          <li class="cm-node flex items-center gap-3.5" style={`--i:${i}`}>
+            <span class={`relative z-10 grid h-[3.1rem] w-[3.1rem] shrink-0 place-items-center rounded-xl bg-white ring-1 ${chip[n.accent]}`}>
+              <Icon name={n.icon as any} size={22} />
+            </span>
+            <div class="flex flex-1 items-center justify-between rounded-xl border border-hairline bg-white px-4 py-2.5 shadow-soft">
+              <div>
+                <p class="text-[0.62rem] font-semibold uppercase tracking-wide text-cool">{n.label}</p>
+                <p class="text-sm font-bold text-navy">{n.sub}</p>
+              </div>
+              <span class="text-cool">⋯</span>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</div>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .cm-node {
+      animation: wf-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+      animation-delay: calc(var(--i) * 160ms);
+    }
+    @keyframes wf-in {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: none; }
+    }
+    .cm-flow-dot {
+      animation: wf-travel 3.4s ease-in-out infinite;
+    }
+    @keyframes wf-travel {
+      0% { top: 0; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+  }
+  .cm-flow-dot { top: 0; }
+</style>

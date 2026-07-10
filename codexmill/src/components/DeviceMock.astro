@@ -1,0 +1,58 @@
+---
+/**
+ * DeviceMock — browser / laptop / phone frames wrapping stylised (NOT real-product)
+ * UI passed via slot (CLAUDE.md §4A). Frames are pure CSS/SVG, no images.
+ *   - browser: window chrome with traffic lights + URL pill
+ *   - laptop:  browser screen on a laptop base
+ *   - phone:   tall rounded device with notch
+ */
+interface Props {
+  variant?: 'browser' | 'laptop' | 'phone';
+  /** fake URL shown in browser/laptop chrome */
+  url?: string;
+  class?: string;
+  /** gentle float animation */
+  float?: boolean;
+}
+const { variant = 'browser', url = 'app.codexmill.com', class: className = '', float = false } =
+  Astro.props;
+const floatCls = float ? 'motion-safe:animate-float-slow' : '';
+---
+
+{
+  variant === 'phone' ? (
+    <div class={`relative ${floatCls} ${className}`}>
+      <div class="relative mx-auto w-full max-w-[18rem] rounded-[2.5rem] border border-hairline bg-navy p-2.5 shadow-glass">
+        {/* aspect ratio keeps the screen phone-shaped at ANY width (no fixed min-height) */}
+        <div class="relative aspect-[1/2.05] overflow-hidden rounded-[2rem] bg-white">
+          {/* notch */}
+          <div class="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-navy" />
+          <div class="absolute inset-0 overflow-hidden pt-6">
+            <slot />
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div class={`relative ${floatCls} ${className}`}>
+      <div class="overflow-hidden rounded-2xl border border-hairline bg-white shadow-glass">
+        {/* window chrome */}
+        <div class="flex items-center gap-2 border-b border-hairline bg-mist px-4 py-3">
+          <span class="h-3 w-3 rounded-full bg-[#FF5F57]" />
+          <span class="h-3 w-3 rounded-full bg-[#FEBC2E]" />
+          <span class="h-3 w-3 rounded-full bg-[#28C840]" />
+          <div class="ml-3 flex flex-1 items-center gap-2 truncate rounded-lg bg-white px-3 py-1.5 text-xs text-cool ring-1 ring-hairline">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="shrink-0">
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </svg>
+            <span class="truncate">{url}</span>
+          </div>
+        </div>
+        <div class="bg-white">
+          <slot />
+        </div>
+      </div>
+    </div>
+  )
+}

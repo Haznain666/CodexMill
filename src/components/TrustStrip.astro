@@ -1,0 +1,42 @@
+---
+/**
+ * TrustStrip — "trusted by" row. Uses labeled PLACEHOLDER logo slots until real,
+ * approved client logos are supplied (CLAUDE.md §9 — no invented logos).
+ */
+import SectionReveal from './SectionReveal.astro';
+
+interface Props {
+  text?: string;
+  class?: string;
+}
+const {
+  text = 'Trusted by growing businesses in home services, med spas, and pet care.',
+  class: className = '',
+} = Astro.props;
+
+// TODO[Ray]: replace these slots with real client/partner logos when available.
+const slots = [
+
+  '/1.png',
+  '/2.png',
+  '/3.png',
+  '/4.png',
+  '/5.png'
+];
+
+---
+
+<section class={`border-y border-hairline bg-white py-10 ${className}`}>
+  <div class="container-page">
+    <SectionReveal class="flex flex-col items-center gap-7">
+      <p class="text-center text-sm font-medium text-cool">{text}</p>
+      <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 opacity-70">
+        {
+            slots.map((logo) => (
+              <img class="flex h-9 w-28 items-center justify-center" src={logo} alt="Logo" />
+            ))
+        }
+      </div>
+    </SectionReveal>
+  </div>
+</section>

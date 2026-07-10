@@ -1,0 +1,115 @@
+---
+/**
+ * BaseLayout — global document shell: <head> SEO/meta, announcement bar,
+ * sticky header, page <slot/>, footer. Per-page SEO meta/OG + JSON-LD
+ * are passed via props (expanded in Phase 8).
+ */
+import '../styles/global.css';
+import { SITE } from '../config/site';
+import AnnouncementBar from '../components/AnnouncementBar.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** OG/Twitter image (absolute path under /public). TODO[Ray]: add real OG art. */
+  image?: string;
+  /** override canonical (defaults to current URL) */
+  canonical?: string;
+  noindex?: boolean;
+  /** extra <head> content (e.g. page-specific JSON-LD) */
+}
+
+const {
+  title,
+  description = SITE.description,
+  image = '/og-default.png',
+  canonical,
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = Astro.site?.href.replace(/\/$/, '') ?? SITE.domain;
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
+const ogImage = new URL(image, siteUrl).href;
+const fullTitle = title.includes(SITE.name) ? title : `${title} | ${SITE.name}`;
+
+// Site-wide ProfessionalService / LocalBusiness structured data (CLAUDE.md §9).
+// [CONFIRM] telephone, address, and sameAs profiles when real details land.
+const orgLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: SITE.name,
+  description: SITE.description,
+  url: siteUrl,
+  image: ogImage,
+  slogan: SITE.masterTagline,
+  areaServed: { '@type': 'Country', name: 'United States' },
+  serviceType: ['Marketing automation', 'Website design', 'Digital marketing', 'GoHighLevel setup'],
+  parentOrganization: { '@type': 'Organization', name: SITE.legalName },
+};
+if (SITE.contact.email) orgLd.email = SITE.contact.email;
+if (SITE.contact.phone) orgLd.telephone = SITE.contact.phone;
+const sameAs = Object.values(SITE.social).filter(Boolean);
+if (sameAs.length) orgLd.sameAs = sameAs;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary meta -->
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#FFFFFF" />
+
+    <!-- Progressive enhancement: [data-reveal] blocks start at opacity:0 and are
+         revealed by an IntersectionObserver. With JS disabled that script never
+         runs, so force their final (visible) state. Keeps the site fully legible
+         without JavaScript. -->
+    <noscript>
+      <style>
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Site-wide structured data -->
+    <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+
+    <!-- Page-specific head (JSON-LD, etc.) -->
+    <slot name="head" />
+  </head>
+
+  <body class="flex min-h-screen flex-col bg-white">
+    <a href="#main" class="skip-link">Skip to content</a>
+    <AnnouncementBar />
+    <Header />
+    <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

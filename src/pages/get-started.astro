@@ -1,0 +1,32 @@
+---
+/**
+ * GET STARTED — hosts the multi-step discovery wizard (DiscoveryForm).
+ * noindex while it's being built out; flip when ready to launch.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Layout from '../layouts/Layout.astro';
+import DiscoveryForm from '../components/discovery/DiscoveryForm.astro';
+import AmbientBackground from '../components/AmbientBackground.astro';
+---
+
+<BaseLayout
+  title="Get Started — Free Automation Audit"
+  description="Answer a few quick questions and we'll map the system that fits your business — or skip ahead and book a quick call."
+  noindex
+>
+  <section class="relative overflow-hidden bg-mist py-14 sm:py-20">
+    <AmbientBackground />
+    <div class="container-page relative">
+      <div class="mx-auto mb-10 max-w-2xl text-center">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Free Automation Audit</p>
+        <h1 class="mt-4 text-display-sm sm:text-display">Let's Find Your <span class="text-gradient">Biggest Wins.</span></h1>
+        <p class="mt-4 text-lg leading-relaxed text-slate">
+          A few quick questions so we can tailor your audit — or check the box to explore first and just grab a quick call.
+        </p>
+      </div>
+      <DiscoveryForm />
+    </div>
+  </section>
+<Layout></Layout>
+</BaseLayout>

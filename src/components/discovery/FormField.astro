@@ -1,0 +1,27 @@
+---
+/**
+ * FormField — label (+ required asterisk) over an input slot, with an inline
+ * error slot the wizard engine toggles. Matches the reference form layout.
+ */
+interface Props {
+  label: string;
+  /** field name — the engine reads/validates by this */
+  name: string;
+  required?: boolean;
+  help?: string;
+  class?: string;
+}
+const { label, name, required = false, help, class: className = '' } = Astro.props;
+---
+
+<div class={`flex flex-col ${className}`} data-field={name} data-required={required ? 'true' : undefined}>
+  <label for={name} class="text-sm font-bold text-navy">
+    {label}
+    {required && <span class="text-forge" aria-hidden="true">&nbsp;*</span>}
+  </label>
+  <div class="mt-1.5">
+    <slot />
+  </div>
+  {help && <p class="mt-1.5 text-xs text-slate">{help}</p>}
+  <p data-error class="mt-1.5 hidden text-sm font-medium text-[#D92D20]"></p>
+</div>

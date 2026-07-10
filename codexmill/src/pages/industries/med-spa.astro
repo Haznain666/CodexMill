@@ -1,0 +1,112 @@
+---
+/**
+ * MED SPA — CLAUDE.md §6.4 / copy deck Page 4.
+ * Signature: booking calendar + treatment-reminder phone; soft, premium.
+ * Pricing: Glow Engine / Glow Authority.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/Hero.astro';
+import PainPoints from '../../components/PainPoints.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import PricingTable from '../../components/PricingTable.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTASection from '../../components/CTASection.astro';
+import DeviceMock from '../../components/DeviceMock.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import BookingCalendar from '../../components/mocks/BookingCalendar.astro';
+import TextBackThread from '../../components/mocks/TextBackThread.astro';
+import { INDUSTRY_SUBTAGLINES } from '../../config/site';
+
+const pains = [
+  { icon: 'calendar', title: 'No-shows quietly drain revenue.', body: 'Every empty chair is a treatment you can’t get back.' },
+  { icon: 'refresh', title: 'Clients forget to rebook.', body: 'Botox wears off, facials lapse — and without a nudge, they drift to a competitor.' },
+  { icon: 'chat', title: 'Consult leads go cold.', body: 'Inquiries from Instagram and your site don’t get answered fast enough.' },
+  { icon: 'users', title: 'Past clients vanish.', body: 'No one’s bringing them back.' },
+];
+
+const steps = [
+  { label: 'Capture', title: 'Instant consult replies', body: 'Inquiries from your site, Instagram, and Facebook get an instant reply and an easy way to book.', icon: 'chat' },
+  { label: 'Confirm', title: 'Reminders cut no-shows', body: 'Automated reminders before every appointment slash no-shows.', icon: 'calendar' },
+  { label: 'Rebook', title: 'Treatment-cycle reminders', body: 'Rebooking reminders bring clients back on schedule — Botox, facials, and more.', icon: 'refresh' },
+  { label: 'Grow', title: 'Reviews, reactivation, promos', body: 'Auto review requests, lapsed-client reactivation, and seasonal promos keep the calendar full.', icon: 'star', note: 'marketing on Glow Authority' },
+];
+
+const faqs = [
+  { q: 'Will this fit how my spa books?', a: 'Yes — booking, reminders, and rebooking are tailored to your treatment cycles.' },
+  { q: 'Do I need tech skills?', a: 'No — it’s done-for-you.' },
+  { q: 'Do I own my client data?', a: 'Always.' },
+  { q: 'How fast can I start?', a: 'Within 7 working days with the base package and within 14 days for higher level packages.' },
+];
+
+const meta = {
+  title: 'Automation & Marketing for Med Spas | CodexMill',
+  description:
+    'Fewer no-shows, more rebookings, and a full calendar — done-for-you automation and marketing for med spas. Book a free audit.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    eyebrow="For Med Spas & Aesthetic Clinics"
+    headline="Fill Your Calendar. Cut the No-Shows."
+    highlight="Keep Clients Coming Back."
+    subTagline={INDUSTRY_SUBTAGLINES['med-spa']}
+    subhead="CodexMill automates your bookings, reminders, and rebookings — and keeps lapsed clients from disappearing — so your chairs stay full without the front-desk chaos."
+    secondaryLabel="See How It Works"
+  >
+    <div slot="visual" class="relative mx-auto max-w-xl">
+      <DeviceMock variant="browser" url="app.codexmill.com/calendar" float>
+        <BookingCalendar
+          title="Treatment Calendar"
+          appts={[
+            { time: '9:30', label: 'Botox consult', accent: 'circuit' },
+            { time: '11:00', label: 'Facial · rebook', accent: 'forge' },
+            { time: '2:00', label: 'Membership visit', accent: 'green' },
+            { time: '4:15', label: 'New consult', accent: 'circuit' },
+          ]}
+        />
+      </DeviceMock>
+      <div class="absolute -bottom-8 right-0 hidden w-48 motion-safe:animate-float lg:block xl:-right-4 xl:w-56" style="animation-delay:-2s">
+        <DeviceMock variant="phone">
+          <TextBackThread
+            contactName="Client · Ava"
+            status="Treatment-cycle reminder"
+            bubbles={[
+              { from: 'us', text: 'Hi Ava! Your Botox is due for a touch-up around now 💆‍♀️ Want to keep your results looking fresh?', meta: 'Rebooking reminder' },
+              { from: 'them', text: 'Yes! Do you have anything Thursday?' },
+              { from: 'us', text: '✨ Reserve your spot', meta: 'Booking link' },
+            ]}
+          />
+        </DeviceMock>
+      </div>
+      <FloatingStat icon="calendar" label="No-shows" value="↓ 41%" accent="green" class="absolute -left-3 top-8 hidden lg:flex" />
+      <FloatingStat icon="refresh" label="Rebooked" value="On cycle" accent="forge" class="absolute -left-6 bottom-24 hidden lg:flex" style="animation-delay:-3s" />
+    </div>
+  </Hero>
+
+  <PainPoints
+    surface="white"
+    eyebrow="Where the revenue slips"
+    heading="The Quiet Leaks in a"
+    highlight="Busy Spa."
+    items={pains}
+  />
+
+  <HowItWorks heading="One System. Chairs" highlight="Always Full." steps={steps} class="bg-mist" />
+
+  <PricingTable
+    industryId="med-spa"
+    heading="Two Ways to"
+    highlight="Glow Up Your Spa."
+    subhead="Start with automation essentials, or add full marketing. Founder pricing available for the first 50 clients."
+  />
+
+  <FAQ heading="Med Spa" highlight="FAQ" items={faqs} schema />
+
+  <CTASection
+    heading="Keep Every Chair Full."
+    body="Book a free audit and we'll show you where no-shows and lapsed clients are costing you — and the system that brings them back."
+  />
+<Layout></Layout>
+</BaseLayout>

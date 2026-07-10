@@ -1,0 +1,245 @@
+---
+/**
+ * PricingTable — renders an industry's plans with a Monthly/Annual toggle and a
+ * Founder Members switch. ALL prices come from pricing.ts (getPlanPricing).
+ * Founder pricing shows ONLY on founderEligible base plans (CLAUDE.md §7).
+ *
+ * Display logic (client script mirrors this):
+ *   monthly + standard : list/mo,            note "billed monthly"
+ *   monthly + founder  : founder/mo, list✗,  note "billed monthly · Founder rate"   [eligible only]
+ *   annual  + standard : annEff/mo, list✗,   note "$annTotal billed yearly · Save 15%"
+ *   annual  + founder  : fAnnEff/mo, annEff✗, note "$fAnnTotal billed yearly · Founder rate" [eligible only]
+ */
+import { getPlans, getPlanPricing, type IndustryId } from '../config/pricing';
+import { FOUNDER, GET_STARTED_URL, CTA_LABEL } from '../config/site';
+import Icon from './Icon.astro';
+import Button from './Button.astro';
+import SectionReveal from './SectionReveal.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  industryId: IndustryId;
+  heading?: string;
+  highlight?: string;
+  subhead?: string;
+  class?: string;
+}
+const {
+  industryId,
+  heading = 'Pick the System That Fits Where You Are.',
+  highlight,
+  subhead = 'Toggle Monthly / Annual — Founder pricing available for the first 50 clients.',
+  class: className = '',
+} = Astro.props;
+
+const plans = getPlans(industryId);
+const cards = plans.map((plan) => ({ plan, pricing: getPlanPricing(plan) }));
+const fmt = (n: number) => n.toLocaleString('en-US');
+const founderDefaultOn = FOUNDER.enabled;
+---
+
+<section id="service-price" class={`relative bg-mist py-20 sm:py-24 ${className}`}>
+  <div class="container-page">
+    <SectionReveal>
+      <SectionHeading heading={heading} highlight={highlight} subhead={subhead} />
+    </SectionReveal>
+
+    <!-- Controls -->
+
+
+    <!-- Cards -->
+    <div
+      class:list={[
+        'mt-12 grid gap-6',
+        cards.length === 3 ? 'lg:grid-cols-3' : 'mx-auto max-w-4xl sm:grid-cols-2',
+      ]}
+    >
+      {
+        cards.map(({ plan, pricing }, i) => {
+          // Force Founder badge visible on all plans (user request)
+          const eligible = true;
+          // Server-rendered initial state: show founder badge (prices hidden)
+          const initFounder = true;
+          const initPrice = initFounder ? pricing.founder?.monthly.price ?? pricing.monthly : pricing.monthly;
+          const initWas = initFounder ? pricing.monthly : null;
+          const initNote = initFounder ? 'Founder rate' : 'billed monthly';
+
+          // data payload the client script reads to re-render on toggle
+          const data = {
+            eligible,
+            annualEff: pricing.annual.effectiveMonthly,
+            annualTotal: pricing.annual.total,
+            founderMonthly: pricing.founder?.monthly.price ?? null,
+            founderAnnualEff: pricing.founder?.annual.effectiveMonthly ?? null,
+            founderAnnualTotal: pricing.founder?.annual.total ?? null,
+          };
+
+          return (
+            <SectionReveal delay={i * 90} class="h-full">
+              <div
+                data-plan-card
+                data-plan={JSON.stringify(data)}
+                class:list={[
+                  'relative flex h-full flex-col rounded-2xl border bg-white p-7 shadow-card transition duration-300',
+                  plan.popular ? 'border-forge/40 ring-1 ring-forge/30 lg:-mt-2 lg:mb-2' : 'border-hairline',
+                ]}
+              >
+                {/* badges */}
+                <div class="absolute -top-3 left-7 flex gap-2">
+                  {plan.popular && (
+                    <span class="rounded-full bg-forge-blue px-3 py-1 text-[0.7rem] font-bold uppercase tracking-wide text-white shadow-soft">
+                      Most Popular
+                    </span>
+                  )}
+                  {eligible && (
+                    <span data-founder-badge class="rounded-full bg-navy px-3 py-1 text-[0.7rem] font-bold uppercase tracking-wide text-white shadow-soft">
+                      Founder
+                    </span>
+                  )}
+                </div>
+
+                <h3 class="mt-1 text-xl font-extrabold text-navy">{plan.name}</h3>
+                <p class="mt-1 text-sm font-semibold text-ember">{plan.tagline}</p>
+
+                <p data-note class="mt-1.5 text-xs font-medium text-cool" hidden>{initNote}</p>
+
+                <p class="mt-4 text-[0.95rem] leading-relaxed text-slate">{plan.blurb}</p>
+
+                {/* features */}
+                <ul class="mt-5 flex-1 space-y-2.5 border-t border-hairline pt-5">
+                  {plan.inheritsFrom && (
+                    <li class="text-sm font-semibold text-navy">Everything in {plan.inheritsFrom}, plus:</li>
+                  )}
+                  {plan.features.map((f) => (
+                    <li class="flex items-start gap-2.5 text-sm text-slate">
+                      <Icon name="check" size={18} class="mt-0.5 shrink-0 text-forge" weight={2.4} />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div class="mt-6">
+                  <Button
+                    href={GET_STARTED_URL}
+                    variant={plan.popular ? 'primary' : 'secondary'}
+                    class="w-full"
+                    aria-label={`${CTA_LABEL} — ${plan.name}`}
+                  >
+                    {CTA_LABEL}
+                  </Button>
+                </div>
+              </div>
+            </SectionReveal>
+          );
+        })
+      }
+    </div>
+
+    <!-- Founder fine print -->
+    {
+      FOUNDER.enabled && (
+        <p class="mx-auto mt-8 max-w-3xl text-center text-xs leading-relaxed text-cool">
+          {FOUNDER.finePrint}
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  // Per-section pricing toggles. Reads each card's data-plan payload and
+  // re-renders price / strike / note / Founder badge on state change.
+  type PlanData = {
+    eligible: boolean;
+    monthly: number;
+    annualEff: number;
+    annualTotal: number;
+    founderMonthly: number | null;
+    founderAnnualEff: number | null;
+    founderAnnualTotal: number | null;
+  };
+
+  const fmt = (n: number) => n.toLocaleString('en-US');
+
+  document.querySelectorAll<HTMLElement>('[data-pricing-root]').forEach((root) => {
+    const section = root.closest('section')!;
+    const billingBtns = root.querySelectorAll<HTMLButtonElement>('[data-billing-btn]');
+    const founderToggle = root.querySelector<HTMLInputElement>('[data-founder-toggle]');
+    const cards = section.querySelectorAll<HTMLElement>('[data-plan-card]');
+
+    const render = () => {
+      const billing = root.dataset.billing === 'annual' ? 'annual' : 'monthly';
+      const founderOn = root.dataset.founder === 'on';
+
+      // billing button active styles
+      billingBtns.forEach((b) => {
+        const active = b.dataset.billingBtn === billing;
+        b.setAttribute('aria-selected', String(active));
+        b.classList.toggle('bg-navy', active);
+        b.classList.toggle('text-white', active);
+        b.classList.toggle('text-slate', !active);
+      });
+
+      cards.forEach((card) => {
+        const d: PlanData = JSON.parse(card.dataset.plan || '{}');
+        const useFounder = founderOn && d.eligible;
+
+        let price: number;
+        let was: number | null = null;
+        let note: string;
+
+        if (billing === 'monthly') {
+          if (useFounder) {
+            price = d.founderMonthly!;
+            was = d.monthly;
+            note = 'billed monthly · Founder rate';
+          } else {
+            price = d.monthly;
+            note = 'billed monthly';
+          }
+        } else {
+          if (useFounder) {
+            price = d.founderAnnualEff!;
+            was = d.annualEff;
+            note = `$${fmt(d.founderAnnualTotal!)} billed yearly · Founder rate`;
+          } else {
+            price = d.annualEff;
+            was = d.monthly;
+            note = `$${fmt(d.annualTotal)} billed yearly · Save 15%`;
+          }
+        }
+
+        const priceEl = card.querySelector<HTMLElement>('[data-price]');
+        const wasEl = card.querySelector<HTMLElement>('[data-was]');
+        const noteEl = card.querySelector<HTMLElement>('[data-note]');
+        const badge = card.querySelector<HTMLElement>('[data-founder-badge]');
+
+        if (priceEl) priceEl.textContent = fmt(price);
+        if (wasEl) {
+          if (was !== null) {
+            wasEl.textContent = `$${fmt(was)}`;
+            wasEl.hidden = false;
+          } else {
+            wasEl.hidden = true;
+          }
+        }
+        if (noteEl) noteEl.textContent = note;
+        // Always display the Founder badge visually per request
+        if (badge) badge.hidden = false;
+      });
+    };
+
+    billingBtns.forEach((b) =>
+      b.addEventListener('click', () => {
+        root.dataset.billing = b.dataset.billingBtn || 'monthly';
+        render();
+      })
+    );
+    founderToggle?.addEventListener('change', () => {
+      root.dataset.founder = founderToggle.checked ? 'on' : 'off';
+      render();
+    });
+
+    render();
+  });
+</script>

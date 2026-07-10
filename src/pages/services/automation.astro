@@ -1,0 +1,111 @@
+---
+/**
+ * OUR SERVICES · AUTOMATION — CLAUDE.md §6.6 / copy deck Page 6. GHL-forward.
+ * Signature: animated workflow/pipeline builder mock.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import FeatureGrid from '../../components/FeatureGrid.astro';
+import CTASection from '../../components/CTASection.astro';
+import DeviceMock from '../../components/DeviceMock.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import GlassCard from '../../components/GlassCard.astro';
+import Icon from '../../components/Icon.astro';
+import WorkflowBuilder from '../../components/mocks/WorkflowBuilder.astro';
+
+const automate = [
+  { icon: 'phone-back', title: 'Missed-call text-back', body: 'Every missed call gets an instant text before they call anyone else.' },
+  { icon: 'bolt', title: 'Instant lead response', body: 'Web and social inquiries answered in minutes, automatically.' },
+  { icon: 'calendar', title: 'Booking & reminders', body: 'Appointments booked, confirmed, and reminded to cut no-shows.' },
+  { icon: 'refresh', title: 'Multi-step follow-up & nurture', body: 'Sequences that follow up until they book or bow out.' },
+  { icon: 'pipeline', title: 'Pipeline tracking', body: 'Every lead tracked from first contact to booked job.' },
+  { icon: 'star', title: 'Review requests', body: 'Auto-asks for a review the moment a job wraps.' },
+  { icon: 'users', title: 'Reactivation', body: 'Win back past customers who’ve gone quiet.' },
+  { icon: 'chat', title: 'Internal alerts', body: 'Your team pinged the instant something needs a human.' },
+];
+
+const meta = {
+  title: 'Business Automation on GoHighLevel | CodexMill',
+  description:
+    'Missed-call text-back, instant lead response, follow-up, and reactivation — your automation engine, built and managed on GoHighLevel.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    eyebrow="Our Services · Automation"
+    headline="Your Follow-Up Should"
+    highlight="Never Sleep."
+    subhead="We build your automation engine on GoHighLevel — so every lead gets answered, every quote gets followed up, and every past customer gets brought back, automatically."
+    secondaryLabel="What we automate"
+    secondaryHref="#what-we-automate"
+  >
+    <div slot="visual" class="relative mx-auto max-w-md">
+      <DeviceMock variant="browser" url="app.codexmill.com/automations" float>
+        <WorkflowBuilder />
+      </DeviceMock>
+      <FloatingStat icon="bolt" label="Avg. reply" value="0:47" accent="forge" class="absolute -left-3 top-10 hidden lg:flex" />
+      <FloatingStat icon="refresh" label="Follow-ups" value="Automatic" accent="circuit" class="absolute -right-3 bottom-12 hidden lg:flex" style="animation-delay:-2.5s" />
+    </div>
+  </Hero>
+
+  <!-- Problem with manual follow-up -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Why manual loses"
+          heading="You Can't Be the One"
+          highlight="Following Up."
+          subhead="You can't text back a lead while you're on a job. You can't remember to follow up five times. Manual follow-up always loses — to forgetfulness, to busyness, to the competitor who automated it."
+        />
+      </SectionReveal>
+    </div>
+  </section>
+
+  <FeatureGrid
+    class="border-t border-hairline"
+    surface="mist"
+    eyebrow="What we automate"
+    heading="The Whole"
+    highlight="Lead Journey."
+    items={automate}
+  />
+  <span id="what-we-automate" class="sr-only"></span>
+
+  <!-- Built on GoHighLevel -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2">
+      <SectionReveal>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Built on GoHighLevel</p>
+        <h2 class="mt-4 text-display-sm sm:text-[2.75rem]">Powered by the Platform <span class="text-gradient">Pros Use.</span></h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate">
+          We build your automations as GoHighLevel workflows and pipelines — enterprise-grade
+          automation without the enterprise price or the tangle of disconnected tools. You get the
+          results; we handle the build.
+        </p>
+        <ul class="mt-6 space-y-3">
+          {['Built and managed for you', 'One platform — nothing disconnected', 'Workflows tuned to your business'].map((t) => (
+            <li class="flex items-center gap-2.5 font-medium text-navy">
+              <Icon name="check" size={18} class="text-forge" weight={2.4} />{t}
+            </li>
+          ))}
+        </ul>
+      </SectionReveal>
+      <SectionReveal delay={120}>
+        <GlassCard class="p-3 sm:p-4">
+          <DeviceMock variant="browser" url="app.codexmill.com/builder">
+            <WorkflowBuilder />
+          </DeviceMock>
+        </GlassCard>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <CTASection
+    heading="Put Your Follow-Up on Autopilot."
+    body="Book a free audit and we'll map the exact automations your business is missing — and what they're costing you."
+  />
+</BaseLayout>

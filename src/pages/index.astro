@@ -1,0 +1,241 @@
+---
+/**
+ * HOME — CLAUDE.md §6.1 / copy deck Page 1.
+ * Signature: hero device cluster (laptop dashboard + phone missed-call text-back)
+ * with floating glass stat cards + the animated automation flow.
+ */
+import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import TrustStrip from '../components/TrustStrip.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import IndustryCard from '../components/IndustryCard.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import FounderBand from '../components/FounderBand.astro';
+import FAQ from '../components/FAQ.astro';
+import CTASection from '../components/CTASection.astro';
+import DeviceMock from '../components/DeviceMock.astro';
+import FloatingStat from '../components/FloatingStat.astro';
+import AutomationFlow from '../components/AutomationFlow.astro';
+import SectionReveal from '../components/SectionReveal.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import GlassCard from '../components/GlassCard.astro';
+import Icon from '../components/Icon.astro';
+import PipelineDashboard from '../components/mocks/PipelineDashboard.astro';
+import TextBackThread from '../components/mocks/TextBackThread.astro';
+import { INDUSTRY_SUBTAGLINES, GET_STARTED_URL } from '../config/site';
+
+const steps = [
+  { label: 'Capture', title: 'Never miss a lead', body: 'Miss a call or get a form fill? They get an instant reply before they call anyone else.', icon: 'phone-back' },
+  { label: 'Follow Up', title: 'Automatic follow-up', body: 'Leads and quotes get followed up automatically until they book or bow out.', icon: 'refresh' },
+  { label: 'Book & Confirm', title: 'Fuller calendar', body: 'Appointments booked, confirmed, and reminded. Fewer no-shows, fuller calendar.', icon: 'calendar' },
+  { label: 'Grow', title: 'Reviews & reactivation', body: 'Auto review requests after the job, plus reactivation campaigns that bring past customers back.', icon: 'star' },
+];
+
+const industries = [
+  { href: '/industries/home-services', name: 'Home Services', icon: 'bolt', blurb: 'HVAC, Roofing, Lawn Mowing & more.', sub: INDUSTRY_SUBTAGLINES['home-services'] },
+  { href: '/industries/med-spa', name: 'Med Spas', icon: 'sparkles', blurb: 'Fuller calendar, fewer no-shows.', sub: INDUSTRY_SUBTAGLINES['med-spa'] },
+  { href: '/industries/pet-grooming', name: 'Pet Grooming', icon: 'star', blurb: 'Rebookings on every cycle.', sub: INDUSTRY_SUBTAGLINES['pet-grooming'] },
+];
+
+const services = [
+  { href: '/services/automation', name: 'Automation', icon: 'workflow', blurb: 'Never miss a lead again.' },
+  { href: '/services/website-design', name: 'Website Design', icon: 'globe', blurb: 'Sites that actually book jobs.' },
+  { href: '/services/digital-marketing', name: 'Digital Marketing', icon: 'megaphone', blurb: 'Ads that turn into appointments.' },
+];
+
+// Social proof — PLACEHOLDERS ONLY. Examples show tone; replace with real, approved quotes (CLAUDE.md §10).
+const testimonials = [
+  { quote: 'Every missed call gets a text back now. We’re booking jobs we used to lose.', who: 'Verified Plumbing Contractor, Texas' },
+  { quote: 'The follow-up alone paid for it.', who: 'HVAC Business Owner, Arizona' },
+  { quote: 'Our calendar stays full without the front-desk chaos.', who: 'Electrical Contractor, Florida' },
+];
+
+const faqs = [
+  { q: 'What platform is this built on?', a: 'GoHighLevel — set up, built, and managed for you. You get the results without the learning curve.' },
+  { q: 'Do I need tech skills?', a: 'No. It’s fully done-for-you, start to finish.' },
+  { q: 'How fast can I start?', a: 'Within 7 working days with the base package and within 14 days for higher level packages. ' },
+  { q: 'Am I locked in?', a: 'Your lead and customers are always yours. ' },
+];
+
+const meta = {
+  title: 'CodexMill — Automation, Websites & Marketing on GoHighLevel',
+  description:
+    'CodexMill helps small businesses capture every lead, follow up automatically, and book more appointments — done-for-you on GoHighLevel. Book a free audit.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <!-- HERO -->
+  <Hero
+    ctaHref={GET_STARTED_URL}
+    eyebrow="Automation · Websites · Marketing — Built on GoHighLevel"
+    headline="Capture Every Lead. Book More Jobs."
+    highlight="Lose the Chaos."
+    subhead="CodexMill installs a done-for-you system that answers, follows up, and books for you — so you stop losing customers to slow replies and missed calls. One platform. Everything connected."
+    trustLine="Done-for-you setup · Built on GoHighLevel"
+    secondaryLabel="See How It Works"
+  >
+    <div slot="visual" class="relative mx-auto max-w-xl">
+      <DeviceMock variant="laptop" url="app.codexmill.com/pipeline" float>
+        <PipelineDashboard />
+      </DeviceMock>
+      <div class="absolute -bottom-8 right-0 hidden w-48 motion-safe:animate-float lg:block xl:-right-4 xl:w-56" style="animation-delay:-2s">
+        <DeviceMock variant="phone">
+          <TextBackThread />
+        </DeviceMock>
+      </div>
+      <FloatingStat icon="phone-back" label="Lead replied" value="0:47" accent="green" class="absolute -left-3 top-8 hidden lg:flex" />
+      <FloatingStat icon="calendar" label="Jobs booked" value="38" accent="circuit" class="absolute -left-6 bottom-28 hidden lg:flex" style="animation-delay:-3s" />
+      <FloatingStat icon="star" label="New review" value="★★★★★" accent="forge" class="absolute -right-4 top-24 hidden lg:flex" style="animation-delay:-1.5s" />
+    </div>
+  </Hero>
+
+  <!-- AUTOMATION FLOW (signature, in motion) -->
+  <section class="border-y border-hairline bg-mist py-16">
+    <div class="container-page">
+      <SectionReveal class="mx-auto mb-10 max-w-2xl text-center">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">See it in motion</p>
+        <h2 class="mt-3 text-2xl font-bold text-navy sm:text-3xl">Watch a lead flow through the system.</h2>
+      </SectionReveal>
+      <SectionReveal>
+        <AutomationFlow class="mx-auto max-w-5xl" />
+      </SectionReveal>
+    </div>
+  </section>
+
+  <TrustStrip />
+
+  <!-- PROBLEM -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="The real problem"
+          heading="The Work Isn't the Problem."
+          highlight="Everything Around It Is."
+          subhead="Leads slip through when you're busy. Quotes go cold with no follow-up. Reviews never get asked for. Past customers never hear from you again. Every gap is money walking out the door — and right now, nobody's catching it."
+        />
+      </SectionReveal>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <HowItWorks
+    heading="One System. Every Lead,"
+    highlight="Handled."
+    steps={steps}
+    class="border-t border-hairline bg-mist"
+  />
+
+  <!-- INDUSTRIES -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Industries we serve"
+          heading="Built for Your Business — Not"
+          highlight="“Small Business” in General."
+        />
+      </SectionReveal>
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        {
+          industries.map((ind, i) => (
+            <SectionReveal delay={i * 100} class="h-full">
+              <IndustryCard href={ind.href} name={ind.name} icon={ind.icon} blurb={ind.blurb} subTagline={ind.sub} class="h-full" />
+            </SectionReveal>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR SERVICES -->
+  <section class="border-t border-hairline bg-mist py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading eyebrow="Our services" heading="Three Ways We Grow" highlight="Your Business." />
+      </SectionReveal>
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        {
+          services.map((s, i) => (
+            <SectionReveal delay={i * 100} class="h-full">
+              <ServiceCard href={s.href} name={s.name} icon={s.icon} blurb={s.blurb} class="h-full" />
+            </SectionReveal>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CODEXMILL -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2">
+      <SectionReveal>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Why CodexMill</p>
+        <h2 class="mt-4 text-display-sm sm:text-[2.75rem]">One Platform. <span class="text-gradient">Everything Connected.</span></h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate">
+          Most businesses duct-tape five tools together and still lose leads in the cracks. We build
+          everything — capture, follow-up, booking, reviews, marketing — on a single platform
+          (GoHighLevel), so nothing falls through and everything talks to everything else. Done for
+          you, start to finish.
+        </p>
+        <ul class="mt-6 space-y-3">
+          {['Capture & follow-up, automated', 'Booking and reminders built in', 'Reviews & reactivation on autopilot'].map((t) => (
+            <li class="flex items-center gap-2.5 font-medium text-navy">
+              <Icon name="check" size={18} class="text-forge" weight={2.4} />{t}
+            </li>
+          ))}
+        </ul>
+        <a href="/ghl" class="mt-7 inline-flex items-center gap-1.5 font-semibold text-ember transition hover:gap-2.5">
+          See how GoHighLevel powers it <span aria-hidden="true">→</span>
+        </a>
+      </SectionReveal>
+      <SectionReveal delay={120}>
+        <GlassCard class="p-3 sm:p-4">
+          <DeviceMock variant="browser" url="app.codexmill.com">
+            <PipelineDashboard title="Your Dashboard" />
+          </DeviceMock>
+        </GlassCard>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <!-- FOUNDER MEMBERS BAND -->
+  <FounderBand />
+
+  <!-- SOCIAL PROOF (placeholders) -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading eyebrow="Social proof" heading="Businesses That Stopped" highlight="Losing Customers." />
+      </SectionReveal>
+      <p class="mx-auto mt-4 max-w-2xl text-center text-sm text-cool">
+       Real results from businesses using our AI receptionist and follow-up system.      </p>
+      <div class="mt-10 grid gap-6 md:grid-cols-3">
+        {
+          testimonials.map((t, i) => (
+            <SectionReveal delay={i * 100} class="h-full">
+              <GlassCard class="flex h-full flex-col p-6" hover>
+                <div class="text-forge" aria-hidden="true">★★★★★</div>
+                <p class="mt-3 flex-1 text-[1.02rem] leading-relaxed text-navy">“{t.quote}”</p>
+                <p class="mt-4 text-sm font-medium text-cool">— {t.who}</p>
+              </GlassCard>
+            </SectionReveal>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- SHORT FAQ -->
+  <FAQ heading="Questions," highlight="Answered." items={faqs} schema class="border-t border-hairline" />
+
+  <!-- FINAL CTA -->
+  <CTASection
+    ctaHref={GET_STARTED_URL}
+    heading="See What You're Leaving on the Table."
+    body="Book a free audit. We'll show you exactly where leads are slipping through today and map the system that fixes it. No pressure, no obligation."
+  />
+<Layout></Layout>
+</BaseLayout>

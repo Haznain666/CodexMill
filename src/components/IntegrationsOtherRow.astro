@@ -1,0 +1,76 @@
+---
+/**
+ * IntegrationsOtherRow — "other integrations we build with GHL" strip.
+ * Uses labeled placeholder logo slots (no real logos fabricated).
+ * Rendered at the bottom of each integration page above the footer.
+ */
+import SectionReveal from './SectionReveal.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  /** current integration slug so we don't self-link */
+  currentSlug?: string;
+  class?: string;
+}
+const { currentSlug = '', class: className = '' } = Astro.props;
+
+// Placeholder integration labels — Ray to swap in the real, approved
+// partner list before publishing. No fabricated logo art here.
+const all = [
+  { image:'/IconHouseCallPro.png', slug: 'IconHouseCallPro', label: 'Housecall Pro' },
+  { image:'/IconJobber.png', slug: 'IconJobber', label: 'Jobber' },
+  { image:'/Stripe.png', slug: 'stripe', label: 'Stripe' },
+  { image:'/Zapier.png', slug: 'zapier', label: 'Zapier' },
+  { image:'/GoogleCalendar.png', slug: 'google-calendar', label: 'Google Calendar' },
+  { image:'/Slack.png', slug: 'slack', label: 'Slack' },
+  { image:'/Twilio.png', slug: 'twilio', label: 'Twilio' },
+  { image:'/Mailchimp.png', slug: 'mailchimp', label: 'Mailchimp' },
+  { image:'/Angie.png', slug: 'Angie', label: 'Angie' },
+  { image:'/HomeAdvisor.png', slug: 'Home Advisor', label: 'Home Advisor' },
+
+
+
+];
+
+const others = all.filter((i) => i.slug !== currentSlug);
+---
+
+<section class={`bg-mist py-16 sm:py-20 ${className}`}>
+  <div class="container-page">
+    <SectionReveal>
+      <SectionHeading
+        eyebrow="More GHL integrations"
+        heading="Everything else we"
+        highlight="wire into GHL."
+      />
+    </SectionReveal>
+
+    <SectionReveal delay={90}>
+      <div class="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {
+          others.map((i) => (
+            <div
+              class="group flex items-center justify-center rounded-2xl border border-hairline bg-white px-4 py-5 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-forge/25 hover:shadow-card"
+              aria-label={`${i.label} integration placeholder`}
+            >
+              <div class="flex items-center gap-2">
+                <span class="grid h-7 w-7 place-items-center rounded-lg bg-forge-blue-soft ring-1 ring-hairline">
+                  <span class="font-display text-xs font-extrabold text-navy">
+                      <img src={i.image}>
+                  </span>
+                </span>
+                <span class="font-display text-sm font-bold text-navy transition group-hover:text-forge">
+                  {i.label}
+                </span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </SectionReveal>
+
+    <p class="mt-6 text-center text-xs text-cool">
+      Partner names shown for reference. Logos will be added as we finalize each partnership.
+    </p>
+  </div>
+</section>

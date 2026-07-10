@@ -1,0 +1,32 @@
+---
+/**
+ * ServiceCard — links to an Our Services page; icon, name, one-liner.
+ * Slightly lighter weight than IndustryCard. Used on Home + Services overview.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  name: string;
+  blurb: string;
+  icon: string;
+  cta?: string;
+  class?: string;
+}
+const { href, name, blurb, icon, cta = 'Learn more', class: className = '' } = Astro.props;
+---
+
+<a
+  href={href}
+  class={`group flex h-full flex-col rounded-2xl border border-hairline bg-white p-6 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-circuit/30 hover:shadow-card ${className}`}
+>
+  <span class="grid h-12 w-12 place-items-center rounded-xl bg-circuit/10 text-circuit transition group-hover:bg-circuit group-hover:text-white">
+    <Icon name={icon as any} size={24} />
+  </span>
+  <h3 class="mt-4 text-lg font-bold text-navy">{name}</h3>
+  <p class="mt-2 flex-1 text-[0.95rem] leading-relaxed text-slate">{blurb}</p>
+  <span class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-navy transition group-hover:gap-2.5 group-hover:text-circuit">
+    {cta}
+    <Icon name="arrow-right" size={16} />
+  </span>
+</a>

@@ -1,0 +1,62 @@
+---
+/**
+ * PainPoints — reusable "here's what's costing you" section for industry pages.
+ * Heading + grid of pain cards (icon, title, body).
+ */
+import Icon from './Icon.astro';
+import GlassCard from './GlassCard.astro';
+import SectionReveal from './SectionReveal.astro';
+import SectionHeading from './SectionHeading.astro';
+
+export interface Pain {
+  icon: string;
+  title: string;
+  body: string;
+}
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  highlight?: string;
+  subhead?: string;
+  items: Pain[];
+  /** mist | white background */
+  surface?: 'mist' | 'white';
+  class?: string;
+}
+const {
+  eyebrow,
+  heading,
+  highlight,
+  subhead,
+  items,
+  surface = 'white',
+  class: className = '',
+} = Astro.props;
+const bg = surface === 'mist' ? 'bg-mist' : 'bg-white';
+const cols = items.length >= 4 ? 'lg:grid-cols-2' : 'lg:grid-cols-3';
+---
+
+<section class={`${bg} py-20 sm:py-24 ${className}`}>
+  <div class="container-page">
+    <SectionReveal>
+      <SectionHeading eyebrow={eyebrow} heading={heading} highlight={highlight} subhead={subhead} />
+    </SectionReveal>
+    <div class={`mx-auto mt-12 grid max-w-5xl gap-5 sm:grid-cols-2 ${cols}`}>
+      {
+        items.map((p, i) => (
+          <SectionReveal delay={i * 90}>
+            <GlassCard class="flex h-full gap-4 p-6" hover>
+              <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-forge/10 text-forge">
+                <Icon name={p.icon as any} size={24} />
+              </span>
+              <div>
+                <h3 class="font-display text-lg font-bold text-navy">{p.title}</h3>
+                <p class="mt-1.5 text-[0.95rem] leading-relaxed text-slate">{p.body}</p>
+              </div>
+            </GlassCard>
+          </SectionReveal>
+        ))
+      }
+    </div>
+  </div>
+</section>

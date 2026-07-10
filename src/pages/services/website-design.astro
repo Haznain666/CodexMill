@@ -1,0 +1,121 @@
+---
+/**
+ * OUR SERVICES · WEBSITE DESIGN
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import FeatureGrid from '../../components/FeatureGrid.astro';
+import CTASection from '../../components/CTASection.astro';
+import DeviceMock from '../../components/DeviceMock.astro';
+import TextBackThread from '../../components/mocks/TextBackThread.astro';
+import PipelineDashboard from '../../components/mocks/PipelineDashboard.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import GlassCard from '../../components/GlassCard.astro';
+import Icon from '../../components/Icon.astro';
+import FunnelSite from '../../components/mocks/FunnelSite.astro';
+import AnimatedPortfolio from '../../components/AnimatedPortfolio.astro';
+
+const build = [
+  { icon: 'target', title: 'High-converting landing pages & funnels', body: 'Built around one clear next step, not a wall of links.' },
+  { icon: 'calendar', title: 'Online booking built in', body: 'Visitors book themselves, right on the page.' },
+  { icon: 'form', title: 'Lead-capture forms wired to your CRM', body: 'Every submission lands in your pipeline instantly.' },
+  { icon: 'phone', title: 'Mobile-first, fast-loading design', body: 'Looks sharp and loads quick on every phone.' },
+  { icon: 'bolt', title: 'Instant automated follow-up', body: 'Every form fill triggers a text/email in minutes.' },
+  { icon: 'star', title: 'Trust built in', body: 'Reviews and social proof placed where they convert.' },
+];
+
+const meta = {
+  title: 'Conversion Websites & Funnels on GoHighLevel | CodexMill',
+  description: 'Fast, mobile, conversion-focused websites and funnels built on GoHighLevel.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    eyebrow="Our Services · Website Design"
+    headline="A Website That Actually"
+    highlight="Books Jobs."
+    subhead="We design fast, modern sites and funnels on GoHighLevel — connected to your CRM, calendar, and automations from day one."
+    secondaryLabel="What we build"
+    secondaryHref="#what-we-build"
+  >
+    <div slot="visual" class="relative mx-auto max-w-xl">
+      <DeviceMock variant="laptop" url="yourbusiness.com" float>
+        <FunnelSite />
+      </DeviceMock>
+      <FloatingStat icon="form" label="Form fill" value="→ CRM in 0:03" accent="circuit" class="absolute -left-3 top-10 hidden lg:flex" />
+      <FloatingStat icon="calendar" label="Booked" value="From the page" accent="green" class="absolute -right-3 bottom-14 hidden lg:flex" style="animation-delay:-2.5s" />
+    </div>
+  </Hero>
+
+  <section class="bg-white py-20 sm:py-24">
+      <!-- ✅ SCROLL-PINNED PORTFOLIO -->
+  <AnimatedPortfolio />
+  </section>
+
+  <FeatureGrid
+    class="border-t border-hairline"
+    surface="mist"
+    eyebrow="What we build"
+    heading="Pages Built to"
+    highlight="Convert."
+    items={build}
+    columns={3}
+  />
+  <span id="what-we-build" class="sr-only"></span>
+
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2">
+      <SectionReveal>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Built on GoHighLevel</p>
+        <h2 class="mt-4 text-display-sm sm:text-[2.75rem]">One Platform, <span class="text-gradient">Zero Gaps.</span></h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate">
+          Because we build on GoHighLevel, your site isn't a separate island. Every form, booking,
+          and click flows straight into your CRM and triggers your automations instantly.
+        </p>
+        <ul class="mt-6 space-y-3">
+          {['Forms → CRM, instantly', 'Booking wired to your calendar', 'Follow-up fires automatically'].map((t) => (
+            <li class="flex items-center gap-2.5 font-medium text-navy">
+              <Icon name="check" size={18} class="text-forge" weight={2.4} />{t}
+            </li>
+          ))}
+        </ul>
+      </SectionReveal>
+
+      <SectionReveal delay={120}>
+      <DeviceMock variant="laptop" url="app.codexmill.com/jobs" float>
+        <PipelineDashboard
+          title="Jobs Pipeline"
+          metrics={[
+            { label: 'New calls', value: '17', accent: 'circuit' },
+            { label: 'Jobs booked', value: '38', accent: 'green' },
+            { label: 'Revenue', value: '$61k', accent: 'forge' },
+          ]}
+          columns={[{ name: 'New', count: 4 }, { name: 'Quoted', count: 3 }, { name: 'Scheduled', count: 5 }]}
+        />
+      </DeviceMock>
+
+            <div class="absolute -bottom-8 right-0 hidden w-48 motion-safe:animate-float lg:block xl:-right-4 xl:w-56" style="animation-delay:-2s">
+        <DeviceMock variant="phone">
+          <TextBackThread
+            contactName="Homeowner · (555) 0142"
+            bubbles={[
+              { from: 'them', text: 'Missed call', meta: 'Missed call · just now' },
+              { from: 'us', text: "Hi! Sorry we missed you — this is the team. Need a repair or a quote? Reply here and we'll get you on the schedule.", meta: 'Auto-reply · 0:47' },
+              { from: 'them', text: 'AC not cooling — can someone come this week?' },
+              { from: 'us', text: '📅 Book your visit', meta: 'Booking link' },
+            ]}
+          />
+        </DeviceMock>
+      </div>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <CTASection
+    heading="Turn Your Site Into a Booking Machine."
+    body="Book a free audit and we'll show you where your current site leaks visitors — and what a converting one looks like."
+  />
+</BaseLayout>

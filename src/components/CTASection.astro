@@ -1,0 +1,42 @@
+---
+/**
+ * CTASection — the closing CTA band every page ends with (CLAUDE.md §6).
+ * Default = navy band (Home final CTA). `variant="light"` for an airy version.
+ */
+import { GET_STARTED_URL, CTA_LABEL } from '../config/site';
+import Button from './Button.astro';
+import SectionReveal from './SectionReveal.astro';
+
+interface Props {
+  heading: string;
+  body?: string;
+  variant?: 'navy' | 'light';
+  /** primary CTA destination (defaults to the external booking calendar) */
+  ctaHref?: string;
+  class?: string;
+}
+const { heading, body, variant = 'navy', ctaHref = GET_STARTED_URL, class: className = '' } = Astro.props;
+const isNavy = variant === 'navy';
+---
+
+<section class={`relative ${isNavy ? 'bg-navy' : 'bg-mist'} ${className}`}>
+  {
+    isNavy && (
+      <div class="pointer-events-none absolute inset-0 overflow-hidden opacity-70" aria-hidden="true">
+        <div class="absolute -left-16 bottom-0 h-72 w-72 rounded-full bg-forge/20 blur-3xl" />
+        <div class="absolute -right-10 -top-10 h-72 w-72 rounded-full bg-circuit/20 blur-3xl" />
+      </div>
+    )
+  }
+  <div class="container-page relative py-20 sm:py-24">
+    <SectionReveal class="mx-auto flex max-w-2xl flex-col items-center text-center">
+      <h2 class={`text-display-sm sm:text-[2.75rem] ${isNavy ? 'text-white' : 'text-navy'}`}>
+        {heading}
+      </h2>
+      {body && <p class={`mt-5 text-lg leading-relaxed ${isNavy ? 'text-white/75' : 'text-slate'}`}>{body}</p>}
+      <div class="mt-8">
+        <Button href={ctaHref} size="lg">{CTA_LABEL}</Button>
+      </div>
+    </SectionReveal>
+  </div>
+</section>

@@ -1,0 +1,38 @@
+---
+/**
+ * IndustryCard — links to an industry page; icon, name, one-liner, sub-tagline.
+ * Hover lift + soft glow. Used on Home + Industries overview.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  name: string;
+  blurb: string;
+  subTagline: string;
+  icon: string;
+  class?: string;
+}
+const { href, name, blurb, subTagline, icon, class: className = '' } = Astro.props;
+---
+
+<a
+  href={href}
+  class={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-hairline bg-white p-7 shadow-soft transition duration-300 hover:-translate-y-1.5 hover:border-forge/25 hover:shadow-card ${className}`}
+>
+  <!-- accent wash on hover -->
+  <div class="pointer-events-none absolute inset-0 -z-0 bg-forge-blue-soft opacity-0 transition duration-300 group-hover:opacity-100" aria-hidden="true"></div>
+
+  <div class="relative">
+    <span class="grid h-14 w-14 place-items-center rounded-xl bg-navy text-white transition group-hover:bg-forge">
+      <Icon name={icon as any} size={26} />
+    </span>
+    <h3 class="mt-5 text-xl font-bold text-navy">{name}</h3>
+    <p class="mt-1 text-sm font-semibold text-ember">{subTagline}</p>
+    <p class="mt-3 text-[0.95rem] leading-relaxed text-slate">{blurb}</p>
+    <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-navy transition group-hover:gap-2.5 group-hover:text-forge">
+      Explore
+      <Icon name="arrow-right" size={16} />
+    </span>
+  </div>
+</a>

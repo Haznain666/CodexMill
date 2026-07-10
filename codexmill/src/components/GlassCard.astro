@@ -1,0 +1,28 @@
+---
+/**
+ * GlassCard — frosted-white elevated surface (CLAUDE.md §4A glass recipe).
+ * `solid` = opaque white card; `glass` = frosted (for floating UI on visuals).
+ * `hover` adds a lift + soft glow micro-interaction.
+ */
+interface Props {
+  variant?: 'solid' | 'glass';
+  hover?: boolean;
+  as?: string;
+  class?: string;
+}
+const { variant = 'solid', hover = false, as = 'div', class: className = '' } = Astro.props;
+const Tag = as as any;
+
+const surface =
+  variant === 'glass'
+    ? 'glass'
+    : 'bg-white border border-hairline shadow-card';
+
+const hoverCls = hover
+  ? 'transition duration-300 ease-out hover:-translate-y-1 hover:shadow-glass hover:border-forge/20'
+  : '';
+---
+
+<Tag class={`rounded-2xl ${surface} ${hoverCls} ${className}`}>
+  <slot />
+</Tag>

@@ -1,0 +1,53 @@
+---
+/**
+ * FounderBand — the Founder Members promo band (CLAUDE.md §6.1, §7.2; copy deck).
+ * Navy band with accent gradient, discount figures, eligible-plan fine print.
+ */
+import { FOUNDER, GET_STARTED_URL } from '../config/site';
+import Button from './Button.astro';
+import SectionReveal from './SectionReveal.astro';
+import Icon from './Icon.astro';
+
+const { monthlyOffLabel, annualOffLabel, totalSpots, finePrint } = FOUNDER;
+---
+
+<section class="relative overflow-hidden bg-navy py-20 sm:py-24">
+  <!-- accent gradient glow -->
+  <div class="pointer-events-none absolute inset-0 opacity-80" aria-hidden="true">
+    <div class="absolute left-1/4 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-forge/25 blur-3xl"></div>
+    <div class="absolute right-1/4 bottom-0 h-72 w-72 translate-x-1/2 rounded-full bg-circuit/25 blur-3xl"></div>
+  </div>
+
+  <div class="container-page relative">
+    <SectionReveal class="mx-auto max-w-3xl text-center">
+      <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-forge-500 ring-1 ring-white/15">
+        <Icon name="sparkles" size={15} />
+        First {totalSpots} clients only
+      </span>
+      <h2 class="mt-6 text-display-sm font-extrabold text-white sm:text-[2.75rem]">
+        Founder Member Pricing
+      </h2>
+      <p class="mt-4 text-lg leading-relaxed text-white/75">
+        Get in early on our starter plan and lock in our best pricing ever for your first year.
+        We're capping this at {totalSpots} businesses so every founding client gets white-glove attention.
+      </p>
+
+      <!-- Discount figures -->
+      <div class="mt-8 flex flex-wrap items-stretch justify-center gap-4">
+        <div class="glass min-w-[10rem] rounded-2xl px-6 py-5 text-center" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.14)">
+          <p class="font-display text-4xl font-extrabold text-white">{monthlyOffLabel}</p>
+          <p class="mt-1 text-sm font-medium text-white/60">monthly, year one</p>
+        </div>
+        <div class="glass min-w-[10rem] rounded-2xl px-6 py-5 text-center" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.14)">
+          <p class="font-display text-4xl font-extrabold text-gradient">{annualOffLabel}</p>
+          <p class="mt-1 text-sm font-medium text-white/60">annual, year one</p>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <Button href={GET_STARTED_URL} size="lg">Claim Your Founder Spot</Button>
+      </div>
+      <p class="mx-auto mt-6 max-w-2xl text-xs leading-relaxed text-white/45">{finePrint}</p>
+    </SectionReveal>
+  </div>
+</section>

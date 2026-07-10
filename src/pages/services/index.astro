@@ -1,0 +1,66 @@
+---
+/**
+ * OUR SERVICES — overview (CLAUDE.md §5 lightweight overview / copy deck Home §Our Services).
+ * Brief intro + three service cards linking to each page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+
+const services = [
+  { href: '/services/automation', name: 'Automation', icon: 'workflow', blurb: 'Never miss a lead again. Missed-call text-back, instant response, follow-up, and reactivation — built on GoHighLevel.' },
+  { href: '/services/website-design', name: 'Website Design', icon: 'globe', blurb: 'Sites that actually book jobs. Fast, conversion-focused websites and funnels wired to your CRM and booking from day one.' },
+  { href: '/services/digital-marketing', name: 'Digital Marketing', icon: 'megaphone', blurb: 'Ads that turn into appointments. Google & Meta ads and local SEO, tracked and managed through GoHighLevel.' },
+];
+
+const meta = {
+  title: 'Our Services — Automation, Websites & Marketing | CodexMill',
+  description:
+    'Three ways we grow your business — automation, website design, and digital marketing, all done-for-you and built on GoHighLevel. Book a free audit.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    layout="centered"
+    eyebrow="Our Services"
+    headline="Three Ways We Grow"
+    highlight="Your Business."
+    subhead="Capture, follow-up, booking, and marketing — all built on one platform, so nothing falls through the cracks."
+  />
+
+  <section class="bg-mist py-16 sm:py-20">
+    <div class="container-page grid gap-6 md:grid-cols-3">
+      {
+        services.map((s, i) => (
+          <SectionReveal delay={i * 100} class="h-full">
+            <ServiceCard href={s.href} name={s.name} icon={s.icon} blurb={s.blurb} class="h-full" />
+          </SectionReveal>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="bg-white py-16">
+    <div class="container-page mx-auto max-w-3xl text-center">
+      <SectionReveal>
+        <h2 class="text-2xl font-bold text-navy">One Platform. Everything Connected.</h2>
+        <p class="mt-4 text-lg leading-relaxed text-slate">
+          We build everything — capture, follow-up, booking, reviews, marketing — on a single
+          platform (GoHighLevel), so nothing falls through and everything talks to everything else.
+          Done for you, start to finish.
+        </p>
+        <a href="/ghl" class="mt-5 inline-flex items-center gap-1.5 font-semibold text-ember transition hover:gap-2.5">
+          Learn about GoHighLevel <span aria-hidden="true">→</span>
+        </a>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <CTASection
+    heading="Let's Build Your Growth System."
+    body="Book a free audit and we'll show you which of these moves the needle first for your business."
+  />
+</BaseLayout>

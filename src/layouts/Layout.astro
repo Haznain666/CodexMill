@@ -1,0 +1,35 @@
+---
+// Layout.astro
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <style>
+      .lc_text-widget--bubble{
+        background: #000000 !important;
+        background-color: #000000 !important;
+
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+    
+    <!-- ✅ New GHL Chat Widget -->
+    <script 
+      is:inline 
+      src="https://widgets.leadconnectorhq.com/loader.js" 
+      data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js" 
+      data-widget-id="6a43f826638eec5af40978ad">
+    </script>
+  </body>
+</html>

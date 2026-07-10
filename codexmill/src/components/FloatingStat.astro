@@ -1,0 +1,45 @@
+---
+/**
+ * FloatingStat — small frosted glass tile that floats around device mockups
+ * (notification toasts / metric tiles, CLAUDE.md §4A). Icon + label + value.
+ * `accent` tints the icon chip. Position with utility classes from the parent.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  icon?: string;
+  /** small label above/below the value */
+  label?: string;
+  value: string;
+  accent?: 'forge' | 'circuit' | 'green';
+  float?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+const { icon, label, value, accent = 'forge', float = true, class: className = '', ...rest } =
+  Astro.props;
+
+const accents: Record<string, string> = {
+  forge: 'bg-forge/10 text-forge',
+  circuit: 'bg-circuit/10 text-circuit',
+  green: 'bg-[#28C840]/10 text-[#1FA34A]',
+};
+const floatCls = float ? 'motion-safe:animate-float' : '';
+---
+
+<div
+  class={`glass flex items-center gap-3 rounded-xl px-3.5 py-2.5 ${floatCls} ${className}`}
+  {...rest}
+>
+  {
+    icon && (
+      <span class={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${accents[accent]}`}>
+        <Icon name={icon as any} size={18} />
+      </span>
+    )
+  }
+  <div class="leading-tight">
+    {label && <p class="text-[0.68rem] font-medium uppercase tracking-wide text-cool">{label}</p>}
+    <p class="text-sm font-bold text-navy">{value}</p>
+  </div>
+</div>

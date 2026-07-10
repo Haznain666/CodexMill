@@ -1,0 +1,56 @@
+---
+/**
+ * INDUSTRIES — overview (CLAUDE.md §6.2 / copy deck Page 2).
+ * Brief intro + three large industry cards linking to each page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/Hero.astro';
+import IndustryCard from '../../components/IndustryCard.astro';
+import CTASection from '../../components/CTASection.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import { INDUSTRY_SUBTAGLINES } from '../../config/site';
+
+const industries = [
+  { href: '/industries/home-services', name: 'Home Services', icon: 'bolt', blurb: 'HVAC, Roofing, Lawn Mowing & more.', sub: INDUSTRY_SUBTAGLINES['home-services'] },
+  { href: '/industries/med-spa', name: 'Med Spa', icon: 'sparkles', blurb: 'Fuller calendar, fewer no-shows, more rebookings.', sub: INDUSTRY_SUBTAGLINES['med-spa'] },
+  { href: '/industries/pet-grooming', name: 'Pet Grooming', icon: 'star', blurb: 'Rebookings on every cycle, happier pet parents.', sub: INDUSTRY_SUBTAGLINES['pet-grooming'] },
+];
+
+const meta = {
+  title: 'Industries We Serve — CodexMill',
+  description:
+    'Automation built around how your industry works — home services, med spas, and pet grooming. Done-for-you on GoHighLevel. Book a free audit.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+
+  <Hero
+    layout="centered"
+    eyebrow="Industries We Serve"
+    headline="Automation Built Around How"
+    highlight="Your Industry Works."
+    subhead="The follow-up, the reminders, the campaigns — tuned to your business, not a generic template."
+  />
+
+  <section class="bg-mist py-16 sm:py-20">
+    <div class="container-page grid gap-6 md:grid-cols-3">
+      {
+        industries.map((ind, i) => (
+          <SectionReveal delay={i * 100} class="h-full">
+            <IndustryCard href={ind.href} name={ind.name} icon={ind.icon} blurb={ind.blurb} subTagline={ind.sub} class="h-full" />
+          </SectionReveal>
+        ))
+      }
+    </div>
+  </section>
+
+  <CTASection
+    heading="Not Sure Which Fits?"
+    body="Book a free audit — we'll look at your business and map the exact system that plugs your biggest leaks."
+  />
+  <Layout></Layout>
+
+
+</BaseLayout>

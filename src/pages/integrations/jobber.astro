@@ -1,0 +1,500 @@
+---
+/**
+ * INTEGRATIONS · JOBBER + GOHIGHLEVEL
+ * Signature: two-app sync flow (Jobber ↔ GHL) with a cursor trail.
+ * Copy is original CodexMill voice — owner-to-owner, outcome-first.
+ * Structurally covers hero → problem → vision → automations → CTA → sync
+ * fields → process → testimonials → why → FAQ → booking → other integrations.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import PainPoints from '../../components/PainPoints.astro';
+import FeatureGrid from '../../components/FeatureGrid.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import CTASection from '../../components/CTASection.astro';
+import FAQ from '../../components/FAQ.astro';
+import IntegrationProcess from '../../components/IntegrationProcess.astro';
+import IntegrationTestimonials from '../../components/IntegrationTestimonials.astro';
+import IntegrationsOtherRow from '../../components/IntegrationsOtherRow.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import GlassCard from '../../components/GlassCard.astro';
+import Icon from '../../components/Icon.astro';
+import Button from '../../components/Button.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import IntegrationSyncFlow from '../../components/mocks/IntegrationSyncFlow.astro';
+import { GET_STARTED_URL, CTA_LABEL } from '../../config/site';
+
+const meta = {
+  title: 'Jobber + GoHighLevel Integration | CodexMill',
+  description:
+    'A done-for-you Jobber + GoHighLevel integration. Clients, quotes, jobs, and invoices sync end-to-end — with GHL running the follow-up, booking, and reactivation.',
+};
+
+const pains = [
+  {
+    icon: 'users',
+    title: 'Clients live in Jobber; leads live everywhere else',
+    body: 'Ad clicks, form fills, and calls end up in a dozen inboxes. Jobber never learns about them until someone types them in.',
+  },
+  {
+    icon: 'form',
+    title: 'Quotes go quiet',
+    body: 'You send an estimate, silence, days pass. Nobody has time to run the follow-up cadence that closes it.',
+  },
+  {
+    icon: 'calendar',
+    title: 'No-shows because reminders lean on memory',
+    body: 'Confirmation and reminder texts happen when someone remembers to send them — which is rarely at the right time.',
+  },
+  {
+    icon: 'star',
+    title: 'Reviews arrive slowly, and not often enough',
+    body: 'Jobs close, invoices go out, life keeps moving. The review request rarely follows within the window that actually gets replies.',
+  },
+  {
+    icon: 'refresh',
+    title: 'Recurring clients rebook themselves — or don\'t',
+    body: 'Nobody proactively reactivates last season\'s customers, so half your best pipeline is sitting quietly in your Jobber history.',
+  },
+  {
+    icon: 'chart',
+    title: 'You can\'t see the whole funnel',
+    body: 'You know how many jobs closed. You don\'t know how many leads it took, where they came from, or which flow closed them.',
+  },
+];
+
+const automations = [
+  {
+    icon: 'phone-back',
+    title: 'New Jobber client → CRM contact',
+    body: 'Any client created inside Jobber shows up in GHL immediately, tagged with source and industry, ready for the right sequence.',
+  },
+  {
+    icon: 'form',
+    title: 'Quote sent → follow-up sequence',
+    body: 'The moment a quote leaves Jobber, GHL opens the follow-up window — SMS and email that keep going until they book, decline, or opt out.',
+  },
+  {
+    icon: 'target',
+    title: 'Quote approved → pipeline update',
+    body: 'Approvals in Jobber slide the opportunity forward in your GHL pipeline automatically, keeping ops and marketing on the same page.',
+  },
+  {
+    icon: 'calendar',
+    title: 'Job scheduled → confirm + remind',
+    body: 'Every scheduled visit fires its own confirmation, its reminder the day before, and an "on the way" text on the day of.',
+  },
+  {
+    icon: 'chart',
+    title: 'Invoice paid → retention flow',
+    body: 'A paid invoice triggers the review request, a thank-you sequence, and lines the client up for the right seasonal rebook offer.',
+  },
+  {
+    icon: 'refresh',
+    title: 'Quote lost → re-engagement',
+    body: 'Quotes that go cold drop into a delayed win-back sequence instead of dying in a folder nobody opens.',
+  },
+];
+
+const syncedFields = {
+  left: {
+    title: 'Jobber',
+    kicker: 'Clients · Quotes · Jobs',
+    fields: [
+      { icon: 'users', label: 'Client details & properties' },
+      { icon: 'form', label: 'Quotes, line items & approvals' },
+      { icon: 'calendar', label: 'Scheduled jobs & visits' },
+      { icon: 'chart', label: 'Invoices & payment events' },
+      { icon: 'workflow', label: 'Job statuses & internal notes' },
+    ],
+  },
+  right: {
+    title: 'GoHighLevel',
+    kicker: 'CRM · Automation · Marketing',
+    fields: [
+      { icon: 'users', label: 'CRM contacts, tags & sources' },
+      { icon: 'pipeline', label: 'Pipelines & opportunities' },
+      { icon: 'chat', label: 'SMS + email conversations' },
+      { icon: 'star', label: 'Review requests & responses' },
+      { icon: 'refresh', label: 'Nurture & reactivation flows' },
+    ],
+  },
+};
+
+const steps = [
+  {
+    label: 'Capture',
+    title: 'Every enquiry, every source, one place',
+    body: 'Forms, calls, ads, Google Business, and Jobber intake — all land as tagged, sourced CRM records in GHL.',
+    icon: 'phone-back',
+  },
+  {
+    label: 'Follow up',
+    title: 'Automated, until they answer',
+    body: 'Quote-sent, quote-approved, quote-cold — each has its own sequence and each one runs itself until it finishes.',
+    icon: 'bolt',
+  },
+  {
+    label: 'Book',
+    title: 'Confirmations, reminders, no-show recovery',
+    body: 'Scheduled visits get confirmed, reminded, and — if they no-show — dropped into an automatic rebook sequence.',
+    icon: 'calendar',
+  },
+  {
+    label: 'Grow',
+    title: 'Reviews, retention, seasonal rebooks',
+    body: 'Paid invoices trigger review asks. Recurring services trigger rebook nudges. Old clients get pulled back with the right offer.',
+    icon: 'trending-up',
+  },
+];
+
+const faqs = [
+  {
+    q: 'Can Jobber and GHL genuinely share the same data?',
+    a: 'Yes. We wire a direct integration that keeps clients, quotes, jobs, and invoices in sync in the moments that matter. Both teams — field ops and marketing — end up looking at the same version of the truth.',
+  },
+  {
+    q: 'Will our Jobber setup have to change?',
+    a: 'Almost never. We wrap around what you already do inside Jobber. If we suggest a tweak (a tag, a job status, a custom field), it\'s so the automations behave predictably — never for the sake of change.',
+  },
+  {
+    q: 'Do I need Zapier or a third-party glue tool?',
+    a: 'No. We build a direct integration and keep the moving parts inside GoHighLevel and Jobber, so there\'s no extra platform to pay for, watch, or debug.',
+  },
+  {
+    q: 'How long does implementation take?',
+    a: 'Most Jobber builds go live in around two weeks — discovery, mapping, build, testing on real records, and turning it on with your team. Complex setups can stretch, and we\'ll flag that on the discovery call.',
+  },
+  {
+    q: 'What if Jobber updates their platform?',
+    a: 'That\'s our problem, not yours. We monitor the platforms we integrate with and adjust the sync if anything on either side shifts. You keep running your business.',
+  },
+  {
+    q: 'Do you offer ongoing support?',
+    a: 'Yes. Every integration comes with ongoing support for as long as you\'re a CodexMill client — bug fixes, tweaks, and new automations as your business changes.',
+  },
+];
+
+const capturedMetrics = [
+  { label: 'Data flow', value: 'Two-way' },
+  { label: 'Setup timeframe', value: '~2 weeks' },
+  { label: 'Manual entry cut', value: 'To near-zero' },
+  { label: 'Ongoing support', value: 'Included' },
+];
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+
+  <!-- =================== HERO =================== -->
+  <Hero
+    eyebrow="Integrations · Jobber"
+    headline="Wire Jobber into GHL — and"
+    highlight="Drop the Duct Tape."
+    subhead="A done-for-you two-way integration between Jobber and GoHighLevel. Clients, quotes, jobs, and invoices sync end-to-end, with GHL running the follow-up, the reminders, the reviews, and the reactivation."
+    trustLine="Direct integration · No Zapier tax · Built and maintained by CodexMill"
+    secondaryLabel="See what we sync"
+    secondaryHref="#what-we-sync"
+  >
+    <div slot="visual" class="relative mx-auto max-w-lg">
+      <IntegrationSyncFlow leftLabel="Jobber" leftAccent="circuit" leftKicker="Quotes · Jobs · Invoices" />
+      <FloatingStat icon="chat" label="Follow-up" value="Auto" accent="forge" class="absolute -left-4 -top-3 hidden lg:flex" />
+      <FloatingStat icon="calendar" label="No-shows" value="Down" accent="circuit" class="absolute -right-4 bottom-2 hidden lg:flex" style="animation-delay:-2.5s" />
+    </div>
+  </Hero>
+
+  <!-- Metrics strip -->
+  <section class="border-y border-hairline bg-white">
+    <div class="container-page grid grid-cols-2 gap-6 py-8 sm:py-10 md:grid-cols-4">
+      {
+        capturedMetrics.map((m, i) => (
+          <SectionReveal delay={i * 80} class="text-center">
+            <p class="font-display text-2xl font-extrabold text-navy sm:text-3xl">{m.value}</p>
+            <p class="mt-1 text-xs font-semibold uppercase tracking-widest text-cool">{m.label}</p>
+          </SectionReveal>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- =================== PROBLEM =================== -->
+  <PainPoints
+    surface="mist"
+    eyebrow="Where the money leaks"
+    heading="Two Systems, Six Ways"
+    highlight="to Lose Work."
+    subhead="If Jobber and GHL aren't in lock-step, the whole cycle — enquiry to rebook — drops jobs it shouldn't. Here's the pattern we see on nearly every audit."
+    items={pains}
+  />
+
+  <section class="bg-mist">
+    <div class="container-page pb-16 sm:pb-20">
+      <SectionReveal>
+        <div class="mx-auto max-w-3xl rounded-2xl border border-hairline bg-white p-8 text-center shadow-soft">
+          <p class="font-display text-xl font-bold text-navy sm:text-2xl">
+            You don't need more leads. You need a <span class="text-gradient">system that closes them.</span>
+          </p>
+          <p class="mt-3 text-slate">Book a free audit — we'll show you exactly where Jobber and GHL are drifting apart.</p>
+          <div class="mt-6 flex justify-center">
+            <Button href={GET_STARTED_URL} size="lg">{CTA_LABEL}</Button>
+          </div>
+        </div>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <!-- =================== HOW IT WORKS =================== -->
+  <HowItWorks
+    heading="From First Enquiry to"
+    highlight="Repeat Season."
+    subhead="One connected cycle — capture, follow up, book, grow — running behind the scenes while you run the crew."
+    steps={steps}
+  />
+
+  <!-- =================== BEFORE / AFTER =================== -->
+  <section class="bg-mist py-16 sm:py-20">
+    <div class="container-page grid gap-10 lg:grid-cols-2">
+      <SectionReveal>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Life without the sync</p>
+        <h3 class="mt-3 font-display text-2xl font-bold text-navy sm:text-3xl">Manual, slow, forgetful</h3>
+        <ul class="mt-6 space-y-3">
+          {
+            [
+              'Enquiries come in, someone eventually adds them to Jobber.',
+              'Quotes get sent; whoever remembers, chases them.',
+              'Reminders happen — or don\'t — depending on the week.',
+              'Review asks go out days late, or not at all.',
+              'Last year\'s clients are a folder, not a pipeline.',
+            ].map((t) => (
+              <li class="flex items-start gap-3 text-slate">
+                <span class="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-hairline text-cool">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19" /></svg>
+                </span>
+                <span>{t}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </SectionReveal>
+      <SectionReveal delay={120}>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Life with the sync</p>
+        <h3 class="mt-3 font-display text-2xl font-bold text-navy sm:text-3xl">Automatic, calm, compounding</h3>
+        <ul class="mt-6 space-y-3">
+          {
+            [
+              'Every enquiry lands in the CRM within seconds — sourced and tagged.',
+              'Quote follow-up runs itself until the client makes a decision.',
+              'Confirmations, reminders, and "on the way" texts are all automatic.',
+              'Review requests fire the moment the invoice is paid.',
+              'Past clients get pulled back with the right offer at the right time.',
+            ].map((t) => (
+              <li class="flex items-start gap-3 font-medium text-navy">
+                <Icon name="check" size={20} class="mt-0.5 text-forge" weight={2.6} />
+                <span>{t}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <!-- =================== AUTOMATIONS GRID =================== -->
+  <FeatureGrid
+    surface="white"
+    columns={3}
+    eyebrow="Battle-tested automations"
+    heading="Jobber + GHL,"
+    highlight="Actually Working Together."
+    subhead="The flows we install on nearly every Jobber build. Each one has a job — book more, chase better, retain longer."
+    items={automations}
+  />
+
+  <!-- =================== NAVY CTA BAND =================== -->
+  <section class="bg-navy py-16 sm:py-20">
+    <div class="container-page">
+      <div class="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/[0.04] p-10 text-center backdrop-blur-sm">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-forge-500">Stop the busywork</p>
+        <h2 class="mt-3 font-display text-3xl font-extrabold text-white sm:text-4xl">
+          Two tools. One workflow. <span class="text-gradient">No copy-paste.</span>
+        </h2>
+        <p class="mt-4 text-white/70">
+          Book a free audit and we'll map every gap between Jobber and GHL, quote the fix, and show you what that fix is worth to your next quarter.
+        </p>
+        <div class="mt-8 flex justify-center">
+          <Button href={GET_STARTED_URL} size="lg">{CTA_LABEL}</Button>
+        </div>
+        <p class="mt-4 text-xs text-white/50">45-minute call · No cost · No obligation</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== SYNC GRID =================== -->
+  <section id="what-we-sync" class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Integration scope"
+          heading="Every Object That Matters,"
+          highlight="On Both Sides."
+          subhead="Change something in Jobber, GHL knows. Change something in GHL, Jobber sees it. No queues to babysit, no late-night imports."
+        />
+      </SectionReveal>
+
+      <div class="mt-14 grid gap-6 lg:grid-cols-2">
+        {
+          [syncedFields.left, syncedFields.right].map((col, idx) => (
+            <SectionReveal delay={idx * 120}>
+              <GlassCard class="h-full p-8">
+                <div class="flex items-center gap-3">
+                  <span class={`grid h-11 w-11 place-items-center rounded-xl ${idx === 0 ? 'bg-circuit/10 text-circuit' : 'bg-forge/10 text-forge'}`}>
+                    <Icon name="layers" size={22} />
+                  </span>
+                  <div>
+                    <p class="font-display text-xl font-bold text-navy">{col.title}</p>
+                    <p class="text-xs font-medium uppercase tracking-widest text-cool">{col.kicker}</p>
+                  </div>
+                </div>
+                <ul class="mt-6 space-y-3">
+                  {
+                    col.fields.map((f) => (
+                      <li class="flex items-center gap-3 rounded-xl bg-mist px-4 py-3 text-navy ring-1 ring-hairline">
+                        <span class={`grid h-8 w-8 place-items-center rounded-lg ${idx === 0 ? 'bg-circuit/10 text-circuit' : 'bg-forge/10 text-forge'}`}>
+                          <Icon name={f.icon as any} size={18} />
+                        </span>
+                        <span class="font-medium">{f.label}</span>
+                        <span class="ml-auto text-xs font-semibold text-cool">Live</span>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </GlassCard>
+            </SectionReveal>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== INTEGRATION METHODS =================== -->
+  <section class="bg-mist py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="How we connect the two"
+          heading="Four Ways We Build the"
+          highlight="Bridge."
+          subhead="Different setups need different plumbing. We pick the right one for your stack — none of them require you to become a developer."
+        />
+      </SectionReveal>
+
+      <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          [
+            { icon: 'workflow', title: 'Direct API integration', body: 'A first-party connection between Jobber and GHL, tuned for your business objects.' },
+            { icon: 'bolt', title: 'Zapier as a bridge', body: 'A fast, cost-effective option when the object model and volume make Zapier the right fit.' },
+            { icon: 'layers', title: 'Make.com scenarios', body: 'For teams that want deeper conditional logic, formatters, and multi-step branching.' },
+            { icon: 'globe', title: 'Native GHL webhooks', body: 'Where Jobber can push events directly to GoHighLevel workflows without middleware.' },
+          ].map((c, i) => (
+            <SectionReveal delay={(i % 4) * 80}>
+              <GlassCard class="h-full p-6" hover>
+                <span class="grid h-11 w-11 place-items-center rounded-xl bg-forge-blue-soft text-navy ring-1 ring-hairline">
+                  <Icon name={c.icon as any} size={22} />
+                </span>
+                <p class="mt-4 font-display text-lg font-bold text-navy">{c.title}</p>
+                <p class="mt-1.5 text-[0.95rem] leading-relaxed text-slate">{c.body}</p>
+              </GlassCard>
+            </SectionReveal>
+          ))
+        }
+      </div>
+
+      <p class="mt-8 text-center text-sm text-cool">
+        We pick the method that fits your data volume, budget, and how much control you want over the middleware.
+      </p>
+    </div>
+  </section>
+
+  <!-- =================== PROCESS =================== -->
+  <IntegrationProcess subhead="A predictable, six-stage delivery. No mystery weeks, no scope creep, no half-live automations left running." />
+
+  <!-- =================== TESTIMONIALS =================== -->
+  <IntegrationTestimonials
+    eyebrow="What owners are saying"
+    heading="Placeholder reviews from"
+    highlight="Jobber operators."
+  />
+
+  <!-- =================== FAQ =================== -->
+  <FAQ heading="Common questions," highlight="answered." items={faqs} schema />
+
+  <!-- =================== BOOKING SECTION =================== -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <div class="grid gap-10 rounded-3xl border border-hairline bg-mist p-8 shadow-soft sm:p-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <SectionReveal>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Ready to sync</p>
+          <h2 class="mt-3 font-display text-3xl font-extrabold text-navy sm:text-4xl">
+            Let's fix Jobber ↔ <span class="text-gradient">GHL together.</span>
+          </h2>
+          <p class="mt-4 text-slate">
+            On a 45-minute call we look at your current Jobber + GHL setup, show you every point where jobs are leaking, and scope the integration live — no discovery deck, no ambiguous next steps.
+          </p>
+          <ul class="mt-6 space-y-3">
+            {
+              [
+                'A walkthrough of your Jobber pipeline and GHL account today',
+                'A clear list of everything that will sync and every event that will trigger',
+                'A one-page scope with pricing and a realistic go-live date',
+              ].map((t) => (
+                <li class="flex items-start gap-2.5 font-medium text-navy">
+                  <Icon name="check" size={20} class="mt-0.5 text-forge" weight={2.6} />
+                  <span>{t}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <Button href={GET_STARTED_URL} size="lg">{CTA_LABEL}</Button>
+            <p class="text-xs text-cool">A real conversation — not a form funnel.</p>
+          </div>
+        </SectionReveal>
+
+        <SectionReveal delay={120}>
+          <GlassCard class="p-6 sm:p-8">
+            <p class="font-display text-lg font-bold text-navy">On the call, we'll cover:</p>
+            <div class="mt-5 space-y-3">
+              {
+                [
+                  { icon: 'search', t: 'Audit — every leak between Jobber and GHL today' },
+                  { icon: 'workflow', t: 'Design — the exact flows we\'ll wire up' },
+                  { icon: 'chart', t: 'Impact — what recovered jobs are worth this quarter' },
+                  { icon: 'calendar', t: 'Timeline — a realistic go-live window' },
+                ].map((it) => (
+                  <div class="flex items-center gap-3 rounded-xl bg-white px-4 py-3 ring-1 ring-hairline">
+                    <span class="grid h-9 w-9 place-items-center rounded-lg bg-forge-blue-soft text-navy ring-1 ring-hairline">
+                      <Icon name={it.icon as any} size={20} />
+                    </span>
+                    <span class="font-medium text-navy">{it.t}</span>
+                  </div>
+                ))
+              }
+            </div>
+            <div class="mt-6 rounded-xl bg-forge/5 p-4 text-sm text-slate ring-1 ring-forge/15">
+              <span class="font-semibold text-navy">Founder Member note:</span> if you qualify for our Home Services base plan, this integration can be bundled — ask about it on the call.
+            </div>
+          </GlassCard>
+        </SectionReveal>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== OTHER INTEGRATIONS =================== -->
+  <IntegrationsOtherRow currentSlug="jobber" />
+
+  <!-- =================== CLOSING NAVY CTA =================== -->
+  <CTASection
+    heading="One System. Every Job, Handled."
+    body="Stop stitching Jobber and GHL by hand. Book a free audit — see exactly what the integration is worth to your calendar this quarter."
+  />
+</BaseLayout>

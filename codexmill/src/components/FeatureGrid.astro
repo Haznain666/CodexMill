@@ -1,0 +1,73 @@
+---
+/**
+ * FeatureGrid — icon grid for "what we automate / build / run" and the GHL
+ * capabilities grid. Optional body text per item; `light` for navy bands.
+ */
+import Icon from './Icon.astro';
+import SectionReveal from './SectionReveal.astro';
+import SectionHeading from './SectionHeading.astro';
+
+export interface Feature {
+  icon: string;
+  title: string;
+  body?: string;
+}
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  highlight?: string;
+  subhead?: string;
+  items: Feature[];
+  columns?: 2 | 3 | 4;
+  light?: boolean;
+  surface?: 'white' | 'mist' | 'navy';
+  class?: string;
+}
+const {
+  eyebrow,
+  heading,
+  highlight,
+  subhead,
+  items,
+  columns = 4,
+  light = false,
+  surface = 'white',
+  class: className = '',
+} = Astro.props;
+
+const bg = surface === 'navy' ? 'bg-navy' : surface === 'mist' ? 'bg-mist' : 'bg-white';
+const colCls = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-2 lg:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' }[columns];
+const cardCls = light
+  ? 'border-white/10 bg-white/[0.06] hover:bg-white/[0.1]'
+  : 'border-hairline bg-white hover:border-forge/20 hover:shadow-card';
+const titleCls = light ? 'text-white' : 'text-navy';
+const bodyCls = light ? 'text-white/65' : 'text-slate';
+const chipCls = light ? 'bg-white/10 text-forge-500' : 'bg-forge-blue-soft text-navy ring-1 ring-hairline';
+---
+
+<section class={`${bg} py-20 sm:py-24 ${className}`}>
+  <div class="container-page">
+    {
+      (heading || eyebrow) && (
+        <SectionReveal>
+          <SectionHeading eyebrow={eyebrow} heading={heading ?? ''} highlight={highlight} subhead={subhead} light={light} />
+        </SectionReveal>
+      )
+    }
+    <div class:list={['mt-12 grid gap-5', colCls]}>
+      {
+        items.map((f, i) => (
+          <SectionReveal delay={(i % 4) * 80}>
+            <div class={`group flex h-full flex-col rounded-2xl border p-6 shadow-soft transition duration-300 hover:-translate-y-1 ${cardCls}`}>
+              <span class={`mb-4 grid h-12 w-12 place-items-center rounded-xl ${chipCls}`}>
+                <Icon name={f.icon as any} size={24} />
+              </span>
+              <h3 class={`font-display text-base font-bold ${titleCls}`}>{f.title}</h3>
+              {f.body && <p class={`mt-1.5 text-sm leading-relaxed ${bodyCls}`}>{f.body}</p>}
+            </div>
+          </SectionReveal>
+        ))
+      }
+    </div>
+  </div>
+</section>

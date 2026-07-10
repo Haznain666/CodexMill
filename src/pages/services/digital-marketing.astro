@@ -1,0 +1,109 @@
+---
+/**
+ * OUR SERVICES · DIGITAL MARKETING — CLAUDE.md §6.8 / copy deck Page 8. GHL-forward.
+ * Signature: ad + analytics dashboard with attribution flow (ad → lead → pipeline → booked).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import FeatureGrid from '../../components/FeatureGrid.astro';
+import CTASection from '../../components/CTASection.astro';
+import DeviceMock from '../../components/DeviceMock.astro';
+import FloatingStat from '../../components/FloatingStat.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import GlassCard from '../../components/GlassCard.astro';
+import Icon from '../../components/Icon.astro';
+import AdsDashboard from '../../components/mocks/AdsDashboard.astro';
+
+const run = [
+  { icon: 'search', title: 'Google Search & Local Services ads', body: 'Show up the moment someone searches for what you do.' },
+  { icon: 'megaphone', title: 'Meta (Facebook / Instagram) ads', body: 'Reach local customers where they scroll.' },
+  { icon: 'globe', title: 'Google Business Profile optimization', body: 'Win the map pack and the "near me" searches.' },
+  { icon: 'trending-up', title: 'Local SEO foundations', body: 'Get found organically in your service area.' },
+  { icon: 'target', title: 'Landing pages & offers built to convert', body: 'Every click lands somewhere designed to book.' },
+];
+
+const meta = {
+  title: 'Google & Meta Ads + Local SEO on GoHighLevel | CodexMill',
+  description:
+    'Ads and local SEO that turn into booked appointments — tracked and managed through GoHighLevel so every lead and dollar is accounted for.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    eyebrow="Our Services · Digital Marketing"
+    headline="Marketing That Turns Into"
+    highlight="Booked Appointments."
+    subhead="We run your Google and Meta ads and local SEO — all tracked and managed through GoHighLevel, so every lead, call, and dollar is accounted for and fed straight into your pipeline."
+    secondaryLabel="What we run"
+    secondaryHref="#what-we-run"
+  >
+    <div slot="visual" class="relative mx-auto max-w-xl">
+      <DeviceMock variant="laptop" url="app.codexmill.com/marketing" float>
+        <AdsDashboard />
+      </DeviceMock>
+      <FloatingStat icon="target" label="Cost / job" value="$31" accent="forge" class="absolute -left-3 top-10 hidden lg:flex" />
+      <FloatingStat icon="trending-up" label="Leads" value="+34%" accent="green" class="absolute -right-3 bottom-14 hidden lg:flex" style="animation-delay:-2.5s" />
+    </div>
+  </Hero>
+
+  <!-- Marketing without tracking problem -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Flying blind"
+          heading="You Can't Grow What You"
+          highlight="Can't Measure."
+          subhead="Most businesses spend on ads and have no idea which ones actually produce jobs. Leads come in and vanish into a voicemail or an inbox. You can't grow what you can't measure — or follow up on."
+        />
+      </SectionReveal>
+    </div>
+  </section>
+
+  <FeatureGrid
+    class="border-t border-hairline"
+    surface="mist"
+    eyebrow="What we run"
+    heading="The Full"
+    highlight="Growth Stack."
+    items={run}
+    columns={3}
+  />
+  <span id="what-we-run" class="sr-only"></span>
+
+  <!-- GHL closes the loop -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2">
+      <SectionReveal>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">GHL closes the loop</p>
+        <h2 class="mt-4 text-display-sm sm:text-[2.75rem]">Every Lead Tracked. <span class="text-gradient">Every Lead Followed Up.</span></h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate">
+          Running everything through GoHighLevel means each ad lead is captured, attributed to its
+          source, instantly followed up by automation, and tracked all the way to a booked job. You
+          finally see what's working — and nothing leaks out the bottom.
+        </p>
+        <ul class="mt-6 space-y-3">
+          {['Every lead attributed to its source', 'Instant automated follow-up', 'Tracked all the way to booked'].map((t) => (
+            <li class="flex items-center gap-2.5 font-medium text-navy">
+              <Icon name="check" size={18} class="text-forge" weight={2.4} />{t}
+            </li>
+          ))}
+        </ul>
+      </SectionReveal>
+      <SectionReveal delay={120}>
+        <GlassCard class="p-3 sm:p-4">
+          <DeviceMock variant="browser" url="app.codexmill.com/attribution">
+            <AdsDashboard />
+          </DeviceMock>
+        </GlassCard>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <CTASection
+    heading="Spend That You Can Actually Track."
+    body="Book a free audit and we'll show you how to turn ad spend into booked jobs — with every dollar accounted for."
+  />
+</BaseLayout>

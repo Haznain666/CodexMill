@@ -1,0 +1,133 @@
+/* ============================================================
+   CodexMill — global stylesheet
+   White-first design system. Brand tokens mirror tailwind.config.mjs.
+   ============================================================ */
+
+/* Self-hosted fonts (perf + offline-safe) ------------------- */
+/* Headlines: Barlow 700/800 */
+@import '@fontsource/barlow/700.css';
+@import '@fontsource/barlow/800.css';
+/* Body: Inter variable (covers 400/500/600/700) */
+@import '@fontsource-variable/inter';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Design tokens as CSS vars (for non-Tailwind contexts / inline SVG) ---- */
+:root {
+  --color-white: #ffffff;
+  --color-mist: #f7f9fc;
+  --color-navy: #0b1a30;
+  --color-slate: #41505f;
+  --color-cool: #7c8a99;
+  --color-hairline: #e6ebf1;
+  --color-forge: #f26419;
+  --color-circuit: #2e9be6;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Frosted white glass recipe (CLAUDE.md §4A) */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(11, 26, 48, 0.06);
+  --glass-shadow: 0 20px 45px rgba(11, 26, 48, 0.1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white font-sans text-slate antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-navy;
+    text-wrap: balance;
+  }
+
+  /* Visible, on-brand focus ring for keyboard users */
+  :focus-visible {
+    outline: 2px solid var(--color-circuit);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: rgba(242, 100, 25, 0.18);
+    color: var(--color-navy);
+  }
+}
+
+@layer components {
+  /* Frosted white glass — reusable surface */
+  .glass {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Accent gradient text (hero highlight word) */
+  .text-gradient {
+    @apply bg-forge-blue bg-clip-text text-transparent;
+  }
+
+  /* Centered page container with consistent gutters */
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
+  }
+
+  /* Skip-to-content link — visible only on keyboard focus */
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus {
+    @apply not-sr-only fixed left-4 top-4 z-[60] rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white shadow-glass;
+  }
+}
+
+/* Offset anchor targets so the sticky header doesn't cover them */
+[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* ---- Reveal-on-scroll baseline (driven by SectionReveal + IntersectionObserver) ---- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+  will-change: opacity, transform;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ============================================================
+   Accessibility — honor reduced motion globally.
+   Show final states; kill ambient/looping motion.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

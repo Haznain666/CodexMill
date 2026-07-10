@@ -1,0 +1,1171 @@
+---
+/**
+ * DiscoveryForm — CodexMill multi-step discovery wizard.
+ * 
+ * FLOW:
+ *   Phone Call: Step 1 → Scheduler → Verify Human → CAPTCHA popup → auto-submit → Thank-you
+ *   Text/Email: Step 1 → Verify Human → CAPTCHA popup → auto-submit → Thank-you (NO extra screen!)
+ * CAPTCHA verification auto-submits immediately — there is no separate Submit button.
+ */
+import FormStep from './FormStep.astro';
+import FormField from './FormField.astro';
+import SelectField from './SelectField.astro';
+import ChipField from './ChipField.astro';
+import SimpleScheduler from './SimpleScheduler.astro';
+import Icon from '../Icon.astro';
+import Button from '../Button.astro';
+import { COUNTRIES } from '../../config/countries';
+
+const inputBase =
+  'w-full rounded-xl border border-hairline bg-white px-4 py-3 text-[0.95rem] text-navy placeholder:text-cool transition focus:border-forge focus:outline-none focus:ring-2 focus:ring-forge/20';
+const selectBase = `${inputBase} cursor-pointer appearance-none pr-11`;
+
+const industries = [
+  'HVAC', 'Roofing', 'Lawn Care & Landscaping', 'Med Spa / Aesthetics',
+  'Pet Grooming', 'Other Home Services', 'Other',
+];
+const contactMethods = ['Phone Call', 'Text Message', 'Email'];
+---
+
+<div data-discovery-form class="mx-auto w-full max-w-3xl">
+  <div class="rounded-2xl border border-hairline bg-white p-6 shadow-card sm:p-8">
+    <!-- STEP 1 — Your Information -->
+    <FormStep id="step-1" step={1} title="Your Information" subtitle="Tell us about you and your business" active>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <FormField label="Full Name" name="firstName" required>
+          <input id="firstName" name="firstName" type="text" autocomplete="name" placeholder="Jane Smith" class={inputBase} />
+        </FormField>
+        <FormField label="Business Name" name="businessName" required>
+          <input id="businessName" name="businessName" type="text" autocomplete="organization" placeholder="Smith Home Services" class={inputBase} />
+        </FormField>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <FormField label="Email Address" name="email" required>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cool">
+              <Icon name="inbox" size={18} />
+            </span>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="jane@business.com" class={`${inputBase} pl-11`} />
+          </div>
+        </FormField>
+        <FormField label="Phone Number" name="phone" required>
+          <div class="flex">
+            <div class="relative shrink-0">
+              <select id="phoneCountry" name="phoneCountry" aria-label="Phone country"
+                class="h-full cursor-pointer appearance-none rounded-l-xl border border-r-0 border-hairline bg-mist py-3 pl-3.5 pr-8 text-sm font-semibold text-navy transition focus:border-forge focus:outline-none focus:ring-2 focus:ring-forge/20">
+                {COUNTRIES.map((c) => <option value={c.code}>{c.short} {c.dial}</option>)}
+              </select>
+              <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-cool">
+                <Icon name="arrow-right" size={14} class="rotate-90" />
+              </span>
+            </div>
+            <input id="phone" name="phone" data-control type="tel" inputmode="tel" autocomplete="tel"
+              placeholder="(555) 123-4567" class={`${inputBase} rounded-l-none`} />
+          </div>
+        </FormField>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <FormField label="Industry" name="industry" required>
+          <div class="relative">
+            <select id="industry" name="industry" class={selectBase}>
+              <option value="" disabled selected>Select your industry</option>
+              {industries.map((i) => <option value={i}>{i}</option>)}
+            </select>
+            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-cool">
+              <Icon name="arrow-right" size={16} class="rotate-90" />
+            </span>
+          </div>
+        </FormField>
+        <FormField label="Preferred Contact Method" name="contactMethod" required>
+          <div class="relative">
+            <select id="contactMethod" name="contactMethod" class={selectBase}>
+              <option value="" disabled selected>How should we reach you?</option>
+              {contactMethods.map((c) => <option value={c}>{c}</option>)}
+            </select>
+            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-cool">
+              <Icon name="arrow-right" size={16} class="rotate-90" />
+            </span>
+          </div>
+        </FormField>
+      </div>
+
+      <FormField label="City / State" name="cityState" required help="Start typing and pick your city from the list.">
+        <div class="relative" data-city-autocomplete>
+          <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cool">
+            <Icon name="search" size={18} />
+          </span>
+          <input id="cityState" name="cityState" data-control data-city-input type="text" role="combobox"
+            aria-autocomplete="list" aria-expanded="false" aria-controls="cityListbox" autocomplete="off"
+            placeholder="Start typing your city…" class={`${inputBase} pl-11`} />
+          <ul id="cityListbox" data-city-list role="listbox"
+            class="absolute left-0 right-0 top-full z-30 mt-1.5 hidden max-h-60 overflow-auto rounded-xl border border-hairline bg-white py-1 shadow-card"></ul>
+          <input type="hidden" id="cityCountry" name="cityCountry" data-city-country />
+        </div>
+      </FormField>
+
+      <label for="exploreFirst"
+        class="mt-1 flex cursor-pointer items-start gap-3 rounded-xl border border-dashed border-forge/40 bg-forge/[0.04] p-4 transition hover:bg-forge/[0.07]">
+        <span class="relative mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-[6px] border-2 border-cool transition" data-branch-box>
+          <input id="exploreFirst" name="exploreFirst" type="checkbox" class="peer sr-only" />
+          <Icon name="check" size={13} weight={3} class="hidden text-white" data-branch-check />
+        </span>
+        <span class="text-sm leading-relaxed text-navy">
+          I'd like to <span class="font-semibold">explore  Codex Mill, a DBA of Dispatch Globally LLC a bit more</span> before sharing details about my business.
+          <span class="mt-0.5 block text-xs text-slate">We'll skip the questionnaire and just set up a quick chat or follow-up.</span>
+        </span>
+      </label>
+
+      <!-- ===== SMS CONSENT (shown when Explore is checked) ===== -->
+      <div id="sms-consent-area" class="mt-5 hidden">
+        <label for="smsConsent" class="flex cursor-pointer items-start gap-3 rounded-xl border border-dashed border-hairline bg-mist/50 p-4 transition hover:bg-mist">
+          <span class="relative mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-[6px] border-2 border-cool transition" data-consent-box>
+            <input id="smsConsent" name="smsConsent" type="checkbox" class="peer sr-only" />
+            <Icon name="check" size={13} weight={3} class="hidden text-white" data-consent-check />
+          </span>
+          <span class="text-sm leading-relaxed text-navy">
+            I agree to receive SMS messages from Codex Mill (a DBA of Dispatch Globally LLC) regarding responses to active support inquiries, ticket status updates, appointment scheduling confirmations or reminders, and follow-up communications directly related to an existing support request.
+            <span class="mt-1 block text-xs text-slate">Message frequency varies. Msg & data rates may apply. Reply STOP to opt out at any time and HELP for help.</span>
+            <span class="mt-1 block text-xs text-slate">By submitting this form, you agree to our <a href="/privacy-policy" target="_blank" class="font-semibold text-forge underline decoration-forge/30 underline-offset-2 hover:text-ember">Privacy Policy</a> and <a href="/terms-condition" target="_blank" class="font-semibold text-forge underline decoration-forge/30 underline-offset-2 hover:text-ember">Terms of Service</a>.</span>
+          </span>
+        </label>
+        <p data-consent-error class="mt-2 hidden text-sm text-[#D92D20]">You must agree to receive messages before submitting.</p>
+      </div>
+
+      <!-- ===== TEXT/EMAIL: Verify Human (right here on Step 1) — auto-submits once verified ===== -->
+      <div id="direct-submit-area" class="hidden mt-6 border-t border-hairline pt-5">
+        <div data-verify-area class="text-right">
+          <button
+            type="button"
+            data-verify-human
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-ember px-6 py-2.5 font-semibold text-white shadow-soft transition hover:bg-ember-600 hover:shadow-glow"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            Verify Human
+          </button>
+          <p class="mt-2 text-xs text-slate">Complete verification to submit</p>
+        </div>
+      </div>
+    </FormStep>
+
+    <!-- STEP 2 — Current Setup -->
+    <FormStep id="step-2" step={2} title="Current Setup" subtitle="What tools do you use today?">
+      <SelectField label="Do you currently have a website?" name="website" placeholder="Choose one"
+        options={["Yes — and I'm happy with it", 'Yes — but it needs work', 'No, not yet']} />
+      <SelectField label="Where is your website hosted / built?" name="hosting" placeholder="Choose one"
+        options={['WordPress', 'Squarespace', 'Wix', 'GoHighLevel', 'Custom-built', 'Not sure', 'N/A']} />
+      <ChipField label="What CRM or software do you currently use?" name="crm" select="multi"
+        options={['No CRM / just spreadsheets', 'ServiceTitan', 'Jobber', 'HouseCall Pro', 'FieldEdge', 'Salesforce', 'GoHighLevel', 'Other / not sure']} />
+      <ChipField label="How do you currently receive leads?" name="leadSources" select="multi"
+        options={['Phone calls only', 'Website contact form', 'Word of mouth / referrals', 'Google Business Profile', 'Facebook / Instagram', 'Yelp / Angi / Thumbtack', 'Door knocking / flyers', 'Google Ads / paid search']} />
+      <SelectField label="Do you currently send automated text messages to leads?" name="autoText" placeholder="Choose one"
+        options={['Yes', 'No', 'Not sure']} />
+      <SelectField label="Do you actively collect Google reviews?" name="collectReviews" placeholder="Choose one"
+        options={['Yes — consistently', 'Sometimes', 'No', 'Not sure']} />
+    </FormStep>
+
+    <!-- STEP 3 — Pain Points -->
+    <FormStep id="step-3" step={3} title="Pain Points & Challenges" subtitle="What's not working right now?">
+      <ChipField label="What are your biggest business challenges right now?" name="challenges" select="multi"
+        help="Select all that apply."
+        options={['Missing calls / losing leads to voicemail', 'Leads go cold before we follow up', 'No system to track leads or jobs', 'Too few Google reviews', "Website doesn't generate inquiries", 'Spending too much time on admin', "Can't track where leads are coming from", 'Losing jobs to competitors', 'Seasonal revenue — slow months hurt', 'No way to re-engage past customers', 'Appointments and no-shows are hard to manage', 'Answering the same questions repeatedly']} />
+      <SelectField label="How quickly do you currently respond to a new lead?" name="responseTime" placeholder="Choose one"
+        options={['Within minutes', 'Within a few hours', 'By end of day', 'A day or more', "We often don't respond"]} />
+      <ChipField label="How satisfied are you with your current lead volume?" name="leadVolume" select="single"
+        options={['Not enough leads', 'Could be better', 'Happy with volume']} />
+      <ChipField label="How satisfied are you with your lead conversion rate?" name="conversion" select="single"
+        options={['Very poor — we lose too many', 'Average — room to improve', 'Good — we close most leads']} />
+    </FormStep>
+
+    <!-- STEP 4 — Goals -->
+    <FormStep id="step-4" step={4} title="Goals & Expectations" subtitle="What do you want to achieve?">
+      <SelectField label="What is your primary goal for the next 6 months?" name="primaryGoal" placeholder="Choose one"
+        options={['Get more leads', 'Convert more of the leads I already get', 'Save time on admin and follow-up', 'Build a stronger online reputation', 'Bring back past customers', 'Launch or improve my marketing', 'Not sure yet']} />
+      <ChipField label="Which services are you most interested in?" name="services" select="multi"
+        help="Select all that apply."
+        options={['Missed-call text-back', 'Instant lead response', 'Appointment booking & reminders', 'Unified inbox (calls/SMS/email/social)', 'Visual lead & job pipeline', 'Google review automation', 'Email & SMS nurture campaigns', 'Referral & reactivation campaigns', 'Google & Meta ad management', 'Seasonal campaign automation', 'Custom workflows & reporting', 'Not sure — need guidance']} />
+      <SelectField label="What is your monthly budget for marketing & automation?" name="budget" placeholder="Choose one"
+        options={['Under $500/mo', '$500–$1,000/mo', '$1,000–$2,000/mo', '$2,000+/mo', 'Not sure yet']} />
+      <ChipField label="How soon are you looking to get started?" name="urgency" select="single"
+        options={['Immediately — I need this yesterday', 'Within the next 2–4 weeks', 'Next 1–3 months — still exploring']} />
+      <SelectField label="How did you hear about  Codex Mill, a DBA of Dispatch Globally LLC?" name="referralSource" placeholder="Choose one"
+        options={['Google search', 'Referral', 'Facebook / Instagram', 'LinkedIn', 'Other']} />
+    </FormStep>
+
+    <!-- STEP 5 — Anything Else? -->
+    <FormStep id="step-5" step={5} title="Anything Else?" subtitle="Optional but very helpful">
+      <FormField label="Describe your ideal outcome in your own words" name="idealOutcome"
+        help="What does success look like for your business in 12 months?">
+        <textarea id="idealOutcome" name="idealOutcome" rows="4"
+          placeholder="e.g. I want my phone ringing every day, never miss a lead, and have more 5-star reviews than any competitor in my area..."
+          class="w-full rounded-xl border border-hairline bg-white px-4 py-3 text-[0.95rem] text-navy placeholder:text-cool transition focus:border-forge focus:outline-none focus:ring-2 focus:ring-forge/20"></textarea>
+      </FormField>
+      <FormField label="Is there anything specific you've tried before that didn't work?" name="triedBefore">
+        <textarea id="triedBefore" name="triedBefore" rows="4"
+          placeholder="We tried running Facebook ads ourselves but wasted money. We had a website built but it never brought in inquiries..."
+          class="w-full rounded-xl border border-hairline bg-white px-4 py-3 text-[0.95rem] text-navy placeholder:text-cool transition focus:border-forge focus:outline-none focus:ring-2 focus:ring-forge/20"></textarea>
+      </FormField>
+
+      <!-- ===== SMS CONSENT (Step 5 — full questionnaire path) ===== -->
+      <div id="sms-consent-step5" class="mt-5" data-field="smsConsent">
+        <label for="smsConsentStep5" class="flex cursor-pointer items-start gap-3 rounded-xl border border-dashed border-hairline bg-mist/50 p-4 transition hover:bg-mist">
+          <span class="relative mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-[6px] border-2 border-cool transition" data-consent-box-step5>
+            <input id="smsConsentStep5" name="smsConsent" type="checkbox" class="peer sr-only" data-control />
+            <Icon name="check" size={13} weight={3} class="hidden text-white" data-consent-check-step5 />
+          </span>
+          <span class="text-sm leading-relaxed text-navy">
+           
+            I agree to receive SMS messages from Codex Mill (a DBA of Dispatch Globally LLC) regarding responses to active support inquiries, ticket status updates, appointment scheduling confirmations or reminders, and follow-up communications directly related to an existing support request.
+            <span class="mt-1 block text-xs text-slate">Message frequency varies. Msg & data rates may apply. Reply STOP to opt out at any time and HELP for help.</span>
+            <span class="mt-1 block text-xs text-slate">By submitting this form, you agree to our <a href="/privacy-policy" target="_blank" class="font-semibold text-forge underline decoration-forge/30 underline-offset-2 hover:text-ember">Privacy Policy</a> and <a href="/terms-condition" target="_blank" class="font-semibold text-forge underline decoration-forge/30 underline-offset-2 hover:text-ember">Terms of Service</a>.</span>
+          </span>
+        </label>
+        <p data-error class="mt-2 hidden text-sm text-[#D92D20]">You must agree to receive messages before submitting.</p>
+      </div>
+
+      <!-- ===== FINAL STEP: Verify Human + Submit (lead-gen questionnaire path) ===== -->
+      <div id="final-submit-area" class="hidden mt-6 border-t border-hairline pt-5">
+        <!-- Verify Human button — auto-submits once verified -->
+        <div data-final-verify-area class="text-right">
+          <button
+            type="button"
+            data-verify-human-final
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-ember px-6 py-2.5 font-semibold text-white shadow-soft transition hover:bg-ember-600 hover:shadow-glow"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            Verify Human
+          </button>
+          <p class="mt-2 text-xs text-slate">Complete verification to submit</p>
+        </div>
+      </div>
+    </FormStep>
+
+    <!-- ===================== BRANCH: explore-first ===================== -->
+    <!-- Phone Call → scheduler with Verify Human → CAPTCHA → Submit flow -->
+    <FormStep id="explore-call" icon="calendar" title="Pick a time that works for a quick call"
+      subtitle="No commitment — just a chance to ask questions and see if  Codex Mill, a DBA of Dispatch Globally LLC is a fit.">
+      <SimpleScheduler id="sched-explore"
+        stepNext={true}
+        data-time-config='{"startHour":8,"endHour":21,"slotMinutes":60,"rows":2}' />
+      <p data-slot-error class="mt-3 hidden text-sm text-[#D92D20]">Please select a date and time before continuing.</p>
+    </FormStep>
+
+    <FormStep id="submitted" icon="check" title="You're all set!" subtitle="">
+      <p data-submitted-msg class="text-lg leading-relaxed text-slate"></p>
+    </FormStep>
+    <!-- STEP 6 — Secure Checkout (Purchase Mode only) -->
+    <!-- ===== SHARED FOOTER: Go Back + Next/Submit ===== -->
+    <div data-footer class="mt-7 border-t border-hairline pt-5">
+      <div class="flex items-center justify-between">
+        <button type="button" data-back class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate transition hover:text-navy">
+          <span aria-hidden="true">←</span> Go Back
+        </button>
+        <Button data-next variant="primary" size="md">
+          <span data-next-label>Next</span>
+          <span aria-hidden="true" data-next-arrow>→</span>
+        </Button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SHARED CAPTCHA POPUP MODAL (for ALL branches) ===== -->
+<div id="captcha-popup" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm"
+  data-captcha-modal>
+  <div class="mx-4 w-full max-w-md rounded-2xl border border-hairline bg-white p-6 shadow-2xl sm:p-8">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="font-display text-lg font-bold text-navy">Verify you're human</h3>
+      <button type="button" data-captcha-close
+        class="rounded-lg p-1 text-cool transition hover:bg-mist hover:text-navy">
+        <Icon name="x" size={20} />
+      </button>
+    </div>
+    <p class="mb-4 text-sm text-slate">Please complete the challenge below to continue:</p>
+    <div id="captcha-widget-popup" class="flex justify-center"></div>
+    <p id="captcha-error-popup" class="mt-3 hidden text-center text-sm text-[#D92D20]">Please complete the CAPTCHA.</p>
+    <p class="mt-4 text-center text-xs text-cool">Once verified, you'll be able to complete your request.</p>
+  </div>
+</div>
+
+<script>
+
+  import { ALL_PLANS } from '../../config/pricing';
+async function submitDiscoveryForm(payload) {
+  try {
+    const res = await fetch('/api/submit-discovery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return Boolean(data.success);
+  } catch (err) {
+    console.error('submitDiscoveryForm fetch error:', err);
+    return false;
+  }
+}
+
+  import { formatPhone, validatePhone, countryName, countryByCode } from '../../config/countries';
+  import { searchCities, cityLabel } from '../../config/cities';
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+  const RECAPTCHA_SITE_KEY = '6LfXPygtAAAAADSbw0cdNjc-Pjm-s9w00z2v_Ddn';
+
+  const recaptchaWidgets = {};
+
+  const renderRecaptcha = (containerId, callbackName) => {
+    const container = document.getElementById(containerId);
+    if (!container || container.innerHTML) return;
+    if (window.grecaptcha?.render) {
+      try {
+        recaptchaWidgets[containerId] = window.grecaptcha.render(containerId, {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback: callbackName,
+        });
+      } catch (e) {
+        console.warn('reCAPTCHA render failed:', e);
+      }
+    }
+  };
+
+  const getRecaptchaResponse = (containerId) => {
+    const widgetId = recaptchaWidgets[containerId];
+    if (widgetId !== undefined && window.grecaptcha?.getResponse) {
+      try {
+        return window.grecaptcha.getResponse(widgetId) || null;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const resetRecaptcha = (containerId) => {
+    const widgetId = recaptchaWidgets[containerId];
+    if (widgetId !== undefined && window.grecaptcha?.reset) {
+      try {
+        window.grecaptcha.reset(widgetId);
+      } catch (e) {}
+    }
+  };
+
+  // ===== POPUP STATE =====
+  let pendingSlot = null;
+  let pendingSchedulerId = null;
+  let pendingFormatted = null;
+  let pendingMode = null; // 'scheduler' | 'direct' | 'final'
+  let directCaptchaVerified = false;
+  let finalCaptchaVerified = false;
+
+  // ===== PURCHASE MODE STATE =====
+  // Detect mode via query string: ?mode=purchase&product=<plan-id>
+  let purchaseMode = false;
+  let purchaseProductId = null;
+  let purchaseProduct = null; // resolved plan object from ALL_PLANS
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const m = params.get('mode');
+    const p = params.get('product');
+    purchaseMode = m === 'purchase';
+    purchaseProductId = p || null;
+    if (purchaseProductId) {
+      purchaseProduct = ALL_PLANS.find((pl) => pl.id === purchaseProductId) || null;
+    }
+  } catch (e) {
+    purchaseMode = false;
+    purchaseProductId = null;
+    purchaseProduct = null;
+  }
+
+  const popupEl = document.getElementById('captcha-popup');
+  const popupErrorEl = document.getElementById('captcha-error-popup');
+
+  const openCaptchaPopup = () => {
+    popupEl.classList.remove('hidden');
+    popupEl.classList.add('flex');
+    popupErrorEl.classList.add('hidden');
+    setTimeout(() => {
+      renderRecaptcha('captcha-widget-popup', 'onRecaptchaPopupVerify');
+    }, 100);
+  };
+
+  const closeCaptchaPopup = () => {
+    popupEl.classList.add('hidden');
+    popupEl.classList.remove('flex');
+    resetRecaptcha('captcha-widget-popup');
+  };
+
+  document.querySelector('[data-captcha-close]')?.addEventListener('click', closeCaptchaPopup);
+  popupEl?.addEventListener('click', (e) => {
+    if (e.target === popupEl) closeCaptchaPopup();
+  });
+
+  // ===== GLOBAL CAPTCHA CALLBACK =====
+  window.onRecaptchaPopupVerify = () => {
+    popupErrorEl.classList.add('hidden');
+    const token = getRecaptchaResponse('captcha-widget-popup');
+    if (!token) return;
+
+    closeCaptchaPopup();
+
+    if (pendingMode === 'scheduler' && pendingSchedulerId) {
+      // Phone Call branch: scheduler ko bolo Submit enable karo
+      const schedulerEl = document.getElementById(pendingSchedulerId);
+      if (schedulerEl) {
+        schedulerEl.dispatchEvent(new CustomEvent('scheduler:captcha-verified', {
+          detail: { token, iso: pendingSlot, formatted: pendingFormatted },
+          bubbles: true
+        }));
+      }
+    } else if (pendingMode === 'direct') {
+      // Text/Email branch: verified — auto-submit immediately, no separate Submit step.
+      directCaptchaVerified = true;
+      document.querySelector('[data-discovery-form]')?.dispatchEvent(
+        new CustomEvent('direct:captcha-verified', { detail: { token }, bubbles: true })
+      );
+    } else if (pendingMode === 'final') {
+      // Final step of the full questionnaire: verified — auto-submit immediately.
+      finalCaptchaVerified = true;
+      document.querySelector('[data-discovery-form]')?.dispatchEvent(
+        new CustomEvent('final:captcha-verified', { detail: { token }, bubbles: true })
+      );
+    }
+  };
+
+  // ---- Discovery wizard engine ----
+  const root = document.querySelector('[data-discovery-form]');
+  if (root) {
+    const card = root.querySelector('.rounded-2xl');
+    const steps = Array.from(root.querySelectorAll('[data-step]'));
+    const backBtn = root.querySelector('[data-back]');
+    const nextBtn = root.querySelector('[data-next]');
+    const nextLabel = root.querySelector('[data-next-label]');
+    const nextArrow = root.querySelector('[data-next-arrow]');
+
+    const answers = {};
+    const history = [];
+    let currentId = 'step-1';
+
+    const NORMAL_PATH = ['step-1', 'step-2', 'step-3', 'step-4', 'step-5'];
+    const SUBMIT_STEPS = new Set(['step-5']);
+    const NO_FOOTER_STEPS = new Set([]);
+    const HIDE_NEXT_STEPS = new Set(['submitted']);
+
+    const byId = (id) => steps.find((s) => s.dataset.step === id);
+
+    const show = (id, scroll = true) => {
+      steps.forEach((s) => s.classList.toggle('hidden', s.dataset.step !== id));
+      currentId = id;
+
+      backBtn.style.visibility = 'visible';
+      backBtn.classList.remove('invisible');
+
+      const footer = root.querySelector('[data-footer]');
+      footer.style.display = NO_FOOTER_STEPS.has(id) ? 'none' : '';
+
+      nextBtn.style.display = HIDE_NEXT_STEPS.has(id) ? 'none' : '';
+
+      if (id === 'step-1') {
+        updateStep1Button();
+      } else if (id === 'explore-call') {
+        // Explore + Phone Call: scheduler is in 'captcha' mode and owns its own
+        // Verify Human -> Submit flow, so hide the shared Next button entirely.
+        // Explore unchecked + Phone Call: scheduler is in 'picker' mode (just a
+        // date/time picker, no CAPTCHA here), so show a plain "Next" button.
+        const schedEl = document.getElementById('sched-explore');
+        const schedMode = schedEl?.dataset.mode || 'captcha';
+        if (schedMode === 'captcha') {
+          nextBtn.style.display = 'none';
+        } else {
+          nextBtn.style.display = '';
+          nextLabel.textContent = 'Next';
+          nextArrow.style.display = '';
+        }
+      } else {
+        // Dynamic labels for Purchase Mode
+        const explore = exploreCheckbox?.checked;
+        if (id === 'step-5' && purchaseMode && !explore) {
+          nextLabel.textContent = 'Proceed to Secure Checkout';
+          nextArrow.style.display = '';
+          nextBtn.style.display = '';
+          finalSubmitArea?.classList.add('hidden');
+        } else if (id === 'step-5') {
+          // Full lead-gen questionnaire path: the shared Next button is replaced by the
+          // dedicated Verify Human -> Submit gate below, so it's never bypassable.
+          nextBtn.style.display = 'none';
+          finalSubmitArea?.classList.remove('hidden');
+        } else if (id === 'step-6' && purchaseMode) {
+          nextLabel.textContent = 'Complete Purchase';
+          nextArrow.style.display = 'none';
+        } else {
+          const isSubmit = SUBMIT_STEPS.has(id);
+          nextLabel.textContent = isSubmit ? 'Submit' : 'Next';
+          nextArrow.style.display = isSubmit ? 'none' : '';
+        }
+      }
+
+      if (scroll) {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+    };
+
+    const setError = (field, msg) => {
+      const err = field.querySelector('[data-error]');
+      const control = field.querySelector('input, select, textarea');
+      if (err) {
+        err.textContent = msg ?? '';
+        err.classList.toggle('hidden', !msg);
+      }
+      if (control) {
+        if (msg) {
+          control.classList.add('border-[#D92D20]');
+        } else {
+          control.classList.remove('border-[#D92D20]');
+        }
+      }
+    };
+
+    const fieldValue = (field) => {
+      const group = field.querySelector('[data-chipgroup]');
+      if (group) {
+        const sel = Array.from(group.querySelectorAll('[data-chip][aria-checked="true"]')).map(
+          (b) => b.dataset.value || ''
+        );
+        return group.dataset.select === 'single' ? sel[0] || '' : sel;
+      }
+      const control = field.querySelector('[data-control]') ?? field.querySelector('input, select, textarea');
+      return (control?.value || '').trim();
+    };
+
+    const phoneCountryEl = () => root.querySelector('#phoneCountry');
+    const cityCountryEl = () => root.querySelector('#cityCountry');
+    const isEmpty = (v) => (Array.isArray(v) ? v.length === 0 : v === '');
+
+    const fieldError = (name, value) => {
+      if (name === 'email') {
+        return EMAIL_RE.test(value) ? null : 'Enter a valid email address (e.g. name@business.com).';
+      }
+      if (name === 'phone') {
+        const code = phoneCountryEl()?.value || 'US';
+        if (!validatePhone(code, value)) {
+          const c = countryByCode(code);
+          return `Enter a valid ${c?.name ?? ''} phone number, e.g. ${c?.placeholder ?? ''}.`;
+        }
+        return null;
+      }
+      if (name === 'cityState') {
+        return cityCountryEl()?.value ? null : 'Please choose your city from the suggestions list.';
+      }
+      return null;
+    };
+
+    const validateStep = (stepEl) => {
+      let ok = true;
+      stepEl.querySelectorAll('[data-field][data-required]').forEach((field) => {
+        const name = field.dataset.field;
+        const value = fieldValue(field);
+        const isChips = !!field.querySelector('[data-chipgroup]');
+        if (isEmpty(value)) {
+          setError(field, isChips ? 'Please select at least one.' : 'This field is required.');
+          ok = false;
+          return;
+        }
+        const msg = fieldError(name, value);
+        setError(field, msg);
+        if (msg) ok = false;
+      });
+      if (stepEl.dataset.step === 'step-1' && ok) {
+        const pc = phoneCountryEl()?.value || '';
+        const cc = cityCountryEl()?.value || '';
+        if (pc && cc && pc !== cc) {
+          const cityField = stepEl.querySelector('[data-field="cityState"]');
+          if (cityField)
+            setError(cityField, `Your phone number is set to ${countryName(pc)} but your city is in ${countryName(cc)} — please make them match.`);
+          ok = false;
+        }
+        // SMS Consent validation for Explore + Text Message path
+        const explore = exploreCheckbox?.checked;
+        const method = String(contactMethodSelect?.value || '').trim().toLowerCase();
+        if (explore && method === 'text message' && smsConsentCheckbox && !smsConsentCheckbox.checked) {
+          if (smsConsentError) smsConsentError.classList.remove('hidden');
+          ok = false;
+        } else if (smsConsentError) {
+          smsConsentError.classList.add('hidden');
+        }
+      }
+      return ok;
+    };
+
+    const collectStep = (stepEl) => {
+      stepEl.querySelectorAll('[data-field]').forEach((field) => {
+        const v = fieldValue(field);
+        if (!isEmpty(v)) answers[field.dataset.field] = v;
+      });
+    };
+
+    const contactMethodSelect = root.querySelector('#contactMethod');
+    const exploreCheckbox = document.getElementById('exploreFirst');
+    const directSubmitArea = document.getElementById('direct-submit-area');
+    const finalSubmitArea = document.getElementById('final-submit-area');
+    const smsConsentArea = document.getElementById('sms-consent-area');
+    const smsConsentCheckbox = document.getElementById('smsConsent');
+    const smsConsentError = document.querySelector('#sms-consent-area [data-consent-error]');
+    const smsConsentBox = document.querySelector('#sms-consent-area [data-consent-box]');
+    const smsConsentCheck = document.querySelector('#sms-consent-area [data-consent-check]');
+
+    const resetScheduler = (schedId) => {
+      const schedEl = document.getElementById(schedId);
+      schedEl?.dispatchEvent(new CustomEvent('scheduler:reset', { bubbles: true }));
+    };
+
+    // ===== SHOW/HIDE Verify Human area on Step 1 =====
+    const updateDirectSubmitArea = () => {
+      const explore = exploreCheckbox?.checked;
+      const method = String(contactMethodSelect?.value || '').trim().toLowerCase();
+      const showDirect = explore && (method === 'text message' || method === 'email');
+
+      // direct-submit-area (Verify Human, auto-submits once verified) only for Text/Email
+      if (directSubmitArea) {
+        directSubmitArea.classList.toggle('hidden', !showDirect);
+      }
+
+      // SMS Consent shows for ALL contact methods when Explore is checked
+      if (smsConsentArea) {
+        smsConsentArea.classList.toggle('hidden', !explore);
+      }
+
+      // Reset state when hidden
+      if (!showDirect) {
+        directCaptchaVerified = false;
+        const verifyArea = document.querySelector('#direct-submit-area [data-verify-area]');
+        if (verifyArea) verifyArea.classList.remove('hidden');
+      }
+
+      // Reset SMS consent visual state when Explore is unchecked
+      if (!explore) {
+        if (smsConsentCheckbox) smsConsentCheckbox.checked = false;
+        if (smsConsentBox) {
+          smsConsentBox.classList.remove('border-forge', 'bg-forge');
+          smsConsentBox.classList.add('border-cool');
+        }
+        if (smsConsentCheck) smsConsentCheck.classList.add('hidden');
+        if (smsConsentError) smsConsentError.classList.add('hidden');
+      }
+
+      // This function only runs when the contact method or Explore checkbox actually
+      // changed — both affect whether/how the scheduler participates in the flow
+      // (Phone Call shows it; Explore picks its 'captcha' vs 'picker' mode). Any such
+      // change invalidates whatever date/time + CAPTCHA state the scheduler was
+      // holding, so clear it rather than let it survive into a different flow.
+      resetScheduler('sched-explore');
+    };
+
+    const updateStep1Button = () => {
+      const explore = exploreCheckbox?.checked;
+      const method = String(contactMethodSelect?.value || '').trim().toLowerCase();
+      const isDirect = explore && (method === 'text message' || method === 'email');
+      const isPhoneCall = method === 'phone call';
+      if (isDirect) {
+        nextBtn.style.display = 'none';
+      } else {
+        nextBtn.style.display = '';
+        if (purchaseMode && explore && !isPhoneCall) {
+          nextLabel.textContent = 'Proceed to Secure Checkout';
+        } else {
+          nextLabel.textContent = 'Next';
+        }
+        nextArrow.style.display = '';
+      }
+    };
+
+    const onNext = () => {
+      const stepEl = byId(currentId);
+      if (currentId === 'step-1') {
+        const contactMethod = contactMethodSelect?.value || answers.contactMethod;
+        answers.contactMethod = contactMethod;
+      }
+      if (!validateStep(stepEl)) {
+        const firstInvalid = stepEl.querySelector('input.border-\[\#D92D20\], select.border-\[\#D92D20\], textarea.border-\[\#D92D20\]');
+        firstInvalid?.focus();
+        return;
+      }
+      collectStep(stepEl);
+
+      if (currentId === 'step-1') {
+        answers.phoneCountry = phoneCountryEl()?.value;
+        answers.cityCountry = cityCountryEl()?.value;
+        const explore = exploreCheckbox?.checked;
+        const contactMethod = String(contactMethodSelect?.value || answers.contactMethod || '').trim();
+        answers.contactMethod = contactMethod;
+        answers.exploreFirst = Boolean(explore);
+        history.push(currentId);
+
+        const isPhoneCall = contactMethod.toLowerCase() === 'phone call';
+        if (isPhoneCall) {
+          answers.smsConsent = smsConsentCheckbox?.checked || false;
+          // Explore + Phone Call: scheduler handles its own Verify Human -> CAPTCHA -> Submit,
+          // and the flow ends right there (no continuing into the questionnaire).
+          // Explore NOT checked + Phone Call: just pick a time (no CAPTCHA here), then
+          // continue on into the full questionnaire, where CAPTCHA/Submit happens on Step 5.
+          const schedEl = document.getElementById('sched-explore');
+          if (schedEl) schedEl.dataset.mode = explore ? 'captcha' : 'picker';
+          prepScheduler('sched-explore');
+          show('explore-call');
+          return;
+        }
+
+        if (explore) {
+          if (purchaseMode) {
+            prepPurchaseSummary();
+            show('step-6');
+            return;
+          }
+          // Text/Email Explore path stays on Step 1 until verification.
+          return;
+        }
+
+        show('step-2');
+        return;
+      }
+
+      if (currentId === 'step-5') {
+        // If we're in Purchase Mode and user didn't opt to explore first, go to checkout (Step 6)
+        const explore = exploreCheckbox?.checked;
+        if (purchaseMode && !explore) {
+          history.push(currentId);
+          // Prepare order summary
+          const productNameEl = root.querySelector('[data-order-product]');
+          const productIdEl = root.querySelector('[data-order-product-id]');
+          const priceEl = root.querySelector('[data-order-price]');
+          const totalEl = root.querySelector('[data-order-total]');
+          if (purchaseProduct) {
+            if (productNameEl) productNameEl.textContent = purchaseProduct.name;
+            if (productIdEl) productIdEl.textContent = `${purchaseProduct.industryId} • ${purchaseProduct.id}`;
+            if (priceEl) priceEl.textContent = String(purchaseProduct.monthly);
+            if (totalEl) totalEl.textContent = String(purchaseProduct.monthly);
+          } else {
+            if (productNameEl) productNameEl.textContent = (purchaseProductId || 'Selected Plan');
+            if (productIdEl) productIdEl.textContent = purchaseProductId || '';
+            if (priceEl) priceEl.textContent = '0';
+            if (totalEl) totalEl.textContent = '0';
+          }
+          show('step-6');
+          return;
+        }
+
+        // Default lead-generation path: the shared Next button is hidden on this step
+        // (see show()) in favor of the dedicated Verify Human -> Submit gate, so there's
+        // nothing to do here. This branch should be unreachable in normal use.
+        return;
+      }
+
+      // Final checkout action for Purchase Mode
+      if (currentId === 'step-6') {
+        // Collect any final fields (none expected here) and submit purchase intent.
+        const step = byId('step-6');
+        if (step) collectStep(step);
+        answers.formStage = 'purchase_complete';
+        answers.purchase = {
+          productId: purchaseProductId,
+          productName: purchaseProduct?.name || purchaseProductId,
+          price: purchaseProduct?.monthly ?? null,
+        };
+
+
+        setTimeout(() => {
+          void submitDiscoveryForm(answers);
+          setSubmittedMessage();
+          show('submitted');
+        }, 900);
+        return;
+      }
+
+      if (currentId === 'explore-call') {
+        const slotInput = root.querySelector('[data-slot-value]');
+        const slotValue = slotInput?.value?.trim() || '';
+        const slotError = root.querySelector('[data-slot-error]');
+        if (!slotValue) {
+          if (slotError) slotError.classList.remove('hidden');
+          return;
+        }
+        if (slotError) slotError.classList.add('hidden');
+        answers.selectedCallSlot = slotValue;
+        history.push(currentId);
+        show('step-2');
+        return;
+      }
+
+      const idx = NORMAL_PATH.indexOf(currentId);
+      if (idx > -1 && idx < NORMAL_PATH.length - 1) {
+        history.push(currentId);
+        show(NORMAL_PATH[idx + 1]);
+      }
+    };
+
+    // ===== GO BACK =====
+    const onBack = () => {
+      if (currentId === 'step-1') {
+        window.location.href = '/';
+        return;
+      }
+      if (currentId === 'submitted') {
+        window.location.href = '/';
+        return;
+      }
+      const prev = history.pop();
+      if (prev) {
+        show(prev);
+      } else {
+        show('step-1');
+      }
+    };
+
+    nextBtn.addEventListener('click', onNext);
+    backBtn.addEventListener('click', onBack);
+
+    const branchInput = root.querySelector('#exploreFirst');
+    const branchBox = root.querySelector('[data-branch-box]');
+    const branchCheck = root.querySelector('[data-branch-check]');
+    branchInput?.addEventListener('change', () => {
+      const on = branchInput.checked;
+      branchBox?.classList.toggle('border-forge', on);
+      branchBox?.classList.toggle('bg-forge', on);
+      branchBox?.classList.toggle('border-cool', !on);
+      branchCheck?.classList.toggle('hidden', !on);
+      updateStep1Button();
+      updateDirectSubmitArea();
+    });
+
+    contactMethodSelect?.addEventListener('change', () => {
+      updateStep1Button();
+      updateDirectSubmitArea();
+    });
+
+    // ===== SMS CONSENT CHECKBOX (Step 1) =====
+    smsConsentCheckbox?.addEventListener('change', () => {
+      const on = smsConsentCheckbox.checked;
+      if (smsConsentBox) {
+        smsConsentBox.classList.toggle('border-forge', on);
+        smsConsentBox.classList.toggle('bg-forge', on);
+        smsConsentBox.classList.toggle('border-cool', !on);
+      }
+      if (smsConsentCheck) smsConsentCheck.classList.toggle('hidden', !on);
+      if (smsConsentError) smsConsentError.classList.add('hidden');
+    });
+
+    // ===== SMS CONSENT CHECKBOX (Step 5) =====
+    const smsConsentStep5Box = document.querySelector('[data-consent-box-step5]');
+    const smsConsentStep5Check = document.querySelector('[data-consent-check-step5]');
+    const smsConsentStep5Input = document.getElementById('smsConsentStep5');
+
+    smsConsentStep5Input?.addEventListener('change', () => {
+      const on = smsConsentStep5Input.checked;
+      if (smsConsentStep5Box) {
+        smsConsentStep5Box.classList.toggle('border-forge', on);
+        smsConsentStep5Box.classList.toggle('bg-forge', on);
+        smsConsentStep5Box.classList.toggle('border-cool', !on);
+      }
+      if (smsConsentStep5Check) smsConsentStep5Check.classList.toggle('hidden', !on);
+      const field = smsConsentStep5Input.closest('[data-field]');
+      if (field) setError(field, null);
+    });
+
+    const paintChip = (chip, on) => {
+      chip.setAttribute('aria-checked', String(on));
+      chip.classList.toggle('border-forge', on);
+      chip.classList.toggle('bg-forge/5', on);
+      const ind = chip.querySelector('[data-indicator]');
+      ind?.classList.toggle('border-forge', on);
+      ind?.classList.toggle('bg-forge', on);
+      ind?.classList.toggle('border-cool', !on);
+      chip.querySelector('[data-chip-check]')?.classList.toggle('hidden', !on);
+      chip.querySelector('[data-chip-dot]')?.classList.toggle('hidden', !on);
+    };
+
+    root.querySelectorAll('[data-chip]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const group = chip.closest('[data-chipgroup]');
+        const single = group.dataset.select === 'single';
+        const on = chip.getAttribute('aria-checked') === 'true';
+        if (single) {
+          group.querySelectorAll('[data-chip]').forEach((c) => paintChip(c, c === chip));
+        } else {
+          paintChip(chip, !on);
+        }
+        const field = chip.closest('[data-field]');
+        if (field) setError(field, null);
+      });
+      chip.addEventListener('keydown', (e) => {
+        if (e.key === ' ') {
+          e.preventDefault();
+          chip.click();
+        }
+      });
+    });
+
+    const phoneInput = root.querySelector('#phone');
+    const phoneCountry = phoneCountryEl();
+    const reformatPhone = () => {
+      if (!phoneInput || !phoneCountry) return;
+      phoneInput.value = formatPhone(phoneCountry.value, phoneInput.value);
+    };
+    phoneInput?.addEventListener('input', reformatPhone);
+    phoneCountry?.addEventListener('change', () => {
+      const c = countryByCode(phoneCountry.value);
+      if (c && phoneInput) phoneInput.placeholder = c.placeholder;
+      reformatPhone();
+      const f = root.querySelector('[data-field="phone"]');
+      if (f) setError(f, null);
+    });
+
+    const cityInput = root.querySelector('[data-city-input]');
+    const cityList = root.querySelector('[data-city-list]');
+    const cityCountry = cityCountryEl();
+    if (cityInput && cityList && cityCountry) {
+      let matches = [];
+      let active = -1;
+      const closeList = () => {
+        cityList.classList.add('hidden');
+        cityInput.setAttribute('aria-expanded', 'false');
+        cityInput.removeAttribute('aria-activedescendant');
+        active = -1;
+      };
+      const choose = (c) => {
+        cityInput.value = cityLabel(c);
+        cityCountry.value = c.country;
+        closeList();
+        const field = cityInput.closest('[data-field]');
+        if (field) setError(field, null);
+      };
+      const paintActive = () => {
+        Array.from(cityList.children).forEach((li, i) => {
+          const on = i === active;
+          li.classList.toggle('bg-mist', on);
+          if (on) cityInput.setAttribute('aria-activedescendant', li.id);
+        });
+      };
+      const render = () => {
+        cityList.innerHTML = '';
+        matches.forEach((c, i) => {
+          const li = document.createElement('li');
+          li.id = `city-opt-${i}`;
+          li.setAttribute('role', 'option');
+          li.setAttribute('aria-selected', 'false');
+          li.className = 'cursor-pointer px-4 py-2.5 text-sm text-navy hover:bg-mist';
+          li.textContent = cityLabel(c);
+          li.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            choose(c);
+          });
+          cityList.appendChild(li);
+        });
+        if (matches.length) {
+          cityList.classList.remove('hidden');
+          cityInput.setAttribute('aria-expanded', 'true');
+        } else {
+          closeList();
+        }
+      };
+      cityInput.addEventListener('input', () => {
+        cityCountry.value = '';
+        matches = searchCities(cityInput.value);
+        active = -1;
+        render();
+      });
+      cityInput.addEventListener('keydown', (e) => {
+        if (cityList.classList.contains('hidden')) return;
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          active = Math.min(active + 1, matches.length - 1);
+          paintActive();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          active = Math.max(active - 1, 0);
+          paintActive();
+        } else if (e.key === 'Enter') {
+          if (active >= 0) {
+            e.preventDefault();
+            choose(matches[active]);
+          }
+        } else if (e.key === 'Escape') {
+          closeList();
+        }
+      });
+      cityInput.addEventListener('blur', () => setTimeout(closeList, 120));
+    }
+
+    const firstName = () => String(answers.firstName || 'there').trim().split(' ')[0] || 'there';
+    const methodPhrase = () => {
+      if (answers.contactMethod === 'Text Message') return 'text';
+      if (answers.contactMethod === 'Phone Call') return 'phone';
+      return 'email';
+    };
+
+    const prepScheduler = (schedId) => {
+      const s = document.getElementById(schedId);
+      if (s) s.dataset.clientName = firstName();
+    };
+
+    const prepPurchaseSummary = () => {
+      const productNameEl = root.querySelector('[data-order-product]');
+      const productIdEl = root.querySelector('[data-order-product-id]');
+      const priceEl = root.querySelector('[data-order-price]');
+      const totalEl = root.querySelector('[data-order-total]');
+      if (purchaseProduct) {
+        if (productNameEl) productNameEl.textContent = purchaseProduct.name;
+        if (productIdEl) productIdEl.textContent = `${purchaseProduct.industryId} • ${purchaseProduct.id}`;
+        if (priceEl) priceEl.textContent = String(purchaseProduct.monthly);
+        if (totalEl) totalEl.textContent = String(purchaseProduct.monthly);
+      } else {
+        if (productNameEl) productNameEl.textContent = (purchaseProductId || 'Selected Plan');
+        if (productIdEl) productIdEl.textContent = purchaseProductId || '';
+        if (priceEl) priceEl.textContent = '0';
+        if (totalEl) totalEl.textContent = '0';
+      }
+    };
+
+    const setSubmittedMessage = () => {
+      const el = root.querySelector('[data-submitted-msg]');
+      const name = firstName();
+      const method = methodPhrase();
+      if (el) {
+        el.textContent = `Thanks, ${name}! We'll reach out by ${method} within one business day to answer your questions.`;
+      }
+    };
+
+
+    // ===== SCHEDULER:VERIFY EVENT (Phone Call branch) =====
+    root.addEventListener('scheduler:verify', (e) => {
+      const detail = e.detail || {};
+      pendingSlot = detail.iso;
+      pendingFormatted = detail.formatted;
+      pendingSchedulerId = detail.schedulerId;
+      pendingMode = 'scheduler';
+      openCaptchaPopup();
+    });
+
+    // ===== SCHEDULER:SUBMIT EVENT (Phone Call final submit) =====
+    root.addEventListener('scheduler:submit', (e) => {
+      const detail = e.detail || {};
+      answers.captchaToken = getRecaptchaResponse('captcha-widget-popup');
+      answers.selectedCallSlot = detail.iso;
+      answers.requestedCall = true;
+
+      const explore = exploreCheckbox?.checked;
+      if (purchaseMode) {
+        answers.formStage = 'purchase_ready';
+        prepPurchaseSummary();
+        show('step-6');
+        return;
+      }
+
+      if (answers.contactMethod === 'Phone Call') {
+        answers.formStage = explore ? 'explore_call_booked' : 'call_booked';
+        void submitDiscoveryForm(answers);
+        setSubmittedMessage();
+        show('submitted');
+        return;
+      }
+
+      answers.formStage = 'call_booked_after_questionnaire';
+      show('step-2');
+    });
+
+    // ===== TEXT/EMAIL: Verify Human button click (Step 1) =====
+    const verifyHumanBtn = document.querySelector('#direct-submit-area [data-verify-human]');
+    verifyHumanBtn?.addEventListener('click', () => {
+      // Validate step 1 first
+      const stepEl = byId('step-1');
+      if (!validateStep(stepEl)) {
+        const firstInvalid = stepEl.querySelector('input.border-\[\#D92D20\], select.border-\[\#D92D20\], textarea.border-\[\#D92D20\]');
+        firstInvalid?.focus();
+        return;
+      }
+
+      // Validate SMS consent (required only for Text Message)
+      const method = contactMethodSelect?.value;
+      if (method === 'Text Message' && smsConsentCheckbox && !smsConsentCheckbox.checked) {
+        if (smsConsentError) smsConsentError.classList.remove('hidden');
+        smsConsentCheckbox.focus();
+        return;
+      }
+      if (smsConsentError) smsConsentError.classList.add('hidden');
+
+      collectStep(stepEl);
+      answers.phoneCountry = phoneCountryEl()?.value;
+      answers.cityCountry = cityCountryEl()?.value;
+      answers.exploreFirst = true;
+      answers.smsConsent = smsConsentCheckbox?.checked || false;
+
+      pendingMode = 'direct';
+      openCaptchaPopup();
+    });
+
+    // ===== TEXT/EMAIL: auto-submit the instant CAPTCHA verification succeeds =====
+    root.addEventListener('direct:captcha-verified', () => {
+      if (!directCaptchaVerified) return;
+
+      // Final SMS consent check (required only for Text Message)
+      const method = contactMethodSelect?.value;
+      if (method === 'Text Message' && smsConsentCheckbox && !smsConsentCheckbox.checked) {
+        if (smsConsentError) smsConsentError.classList.remove('hidden');
+        directCaptchaVerified = false;
+        return;
+      }
+      if (smsConsentError) smsConsentError.classList.add('hidden');
+
+      const stepEl = byId('step-1');
+      if (stepEl) collectStep(stepEl);
+      answers.captchaToken = getRecaptchaResponse('captcha-widget-popup');
+      answers.smsConsent = smsConsentCheckbox?.checked || false;
+
+      if (purchaseMode) {
+        answers.formStage = 'purchase_ready';
+        prepPurchaseSummary();
+        show('step-6');
+        return;
+      }
+
+      answers.formStage = 'explore_direct_submit';
+      void submitDiscoveryForm(answers);
+      setSubmittedMessage();
+      show('submitted');
+    });
+
+    // ===== FINAL STEP (Step 5): Verify Human button click =====
+    const verifyHumanFinalBtn = document.querySelector('#final-submit-area [data-verify-human-final]');
+    verifyHumanFinalBtn?.addEventListener('click', () => {
+      const stepEl = byId('step-5');
+      if (!stepEl) return;
+      if (!validateStep(stepEl)) {
+        const firstInvalid = stepEl.querySelector('input.border-\[\#D92D20\], select.border-\[\#D92D20\], textarea.border-\[\#D92D20\]');
+        firstInvalid?.focus();
+        return;
+      }
+
+      collectStep(stepEl);
+      pendingMode = 'final';
+      openCaptchaPopup();
+    });
+
+    // ===== FINAL STEP (Step 5): auto-submit the instant CAPTCHA verification succeeds =====
+    root.addEventListener('final:captcha-verified', () => {
+      if (!finalCaptchaVerified) return;
+
+      const stepEl = byId('step-5');
+      if (stepEl) collectStep(stepEl);
+      answers.captchaToken = getRecaptchaResponse('captcha-widget-popup');
+      answers.formStage = 'questionnaire_complete';
+
+      void submitDiscoveryForm(answers);
+      history.push(currentId);
+      setSubmittedMessage();
+      show('submitted');
+    });
+
+    show('step-1', false);
+  }
+</script>
+<script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>

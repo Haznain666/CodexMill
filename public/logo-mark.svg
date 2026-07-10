@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" role="img" aria-label="CodexMill">
+  <rect width="48" height="48" rx="13" fill="#0B1A30"/>
+  <!-- C arc -->
+  <path d="M30 14.5a9.5 9.5 0 1 0 0 19" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round"/>
+  <!-- M (mill) mark -->
+  <path d="M26 34V14l6 10 6-10v20" stroke="#F26419" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

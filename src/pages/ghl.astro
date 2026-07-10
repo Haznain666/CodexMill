@@ -1,0 +1,103 @@
+---
+/**
+ * GHL — CLAUDE.md §6.9 / copy deck Page 9. Navy hero for contrast.
+ * Signature: animated all-in-one platform diagram (Capture → Nurture → Convert → Retain).
+ * Showcases what GoHighLevel can do; positions CodexMill as the experts.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import FeatureGrid from '../components/FeatureGrid.astro';
+import CTASection from '../components/CTASection.astro';
+import SectionReveal from '../components/SectionReveal.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import PlatformDiagram from '../components/PlatformDiagram.astro';
+import Icon from '../components/Icon.astro';
+
+const capabilities = [
+  { icon: 'form', title: 'Capture', body: 'Funnels, landing pages, forms, and calendars that turn visitors into leads.' },
+  { icon: 'workflow', title: 'Automate', body: 'Workflows that follow up by text and email the instant a lead comes in — and never forget.' },
+  { icon: 'pipeline', title: 'Convert', body: 'Visual sales pipelines so every lead is tracked from first contact to booked job.' },
+  { icon: 'inbox', title: 'Communicate', body: 'A unified inbox for SMS, email, calls, and social DMs in one thread.' },
+  { icon: 'star', title: 'Retain', body: 'Automated review requests, reputation management, and reactivation campaigns.' },
+  { icon: 'chart', title: 'Measure', body: 'Dashboards and reporting that show what\'s actually driving revenue.' },
+];
+
+const meta = {
+  title: 'The Power of GoHighLevel | CodexMill',
+  description:
+    'GoHighLevel is the all-in-one platform behind everything we build — capture, automate, convert, and retain. See what it can do, run by the experts at CodexMill.',
+};
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <Hero
+    light
+    eyebrow="The Engine Behind Everything We Do"
+    headline="One Platform. Total Control of Your"
+    highlight="Growth."
+    subhead="GoHighLevel replaces the tangle of disconnected tools most businesses fight with — capture, follow-up, booking, pipelines, reviews, and marketing, all in one place. CodexMill are the specialists who turn that power into booked jobs for you."
+    secondaryLabel="See what it does"
+    secondaryHref="#capabilities"
+  >
+    <div slot="visual" class="px-2 py-6 sm:py-2">
+      <PlatformDiagram light />
+    </div>
+  </Hero>
+
+  <!-- One platform, total control -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="One platform, total control"
+          heading="Stop Duct-Taping Five Tools"
+          highlight="Together."
+          subhead="Stop losing leads in the gaps between a CRM, a scheduler, an email tool, a texting app, and a review tool. GoHighLevel does it all under one roof, and everything talks to everything."
+        />
+      </SectionReveal>
+    </div>
+  </section>
+
+  <FeatureGrid
+    surface="mist"
+    class="border-y border-hairline"
+    eyebrow="What GoHighLevel can do"
+    heading="Six Capabilities,"
+    highlight="One Roof."
+    items={capabilities}
+    columns={3}
+  />
+  <span id="capabilities" class="sr-only"></span>
+
+  <!-- How CodexMill turns the platform into results -->
+  <section class="bg-white py-20 sm:py-24">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2">
+      <SectionReveal class="order-2 lg:order-1">
+        <PlatformDiagram />
+      </SectionReveal>
+      <SectionReveal delay={120} class="order-1 lg:order-2">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">From platform to results</p>
+        <h2 class="mt-4 text-display-sm sm:text-[2.75rem]">The Platform Is Powerful. <span class="text-gradient">The Setup Is Everything.</span></h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate">
+          GoHighLevel can do almost anything — which is exactly why most owners never use it well.
+          We architect, build, and manage the whole system for your business, so you get the results
+          without the learning curve.
+        </p>
+        <ul class="mt-6 space-y-3">
+          {['We architect the whole system', 'We build and manage it for you', 'You get booked jobs, not homework'].map((t) => (
+            <li class="flex items-center gap-2.5 font-medium text-navy">
+              <Icon name="check" size={18} class="text-forge" weight={2.4} />{t}
+            </li>
+          ))}
+        </ul>
+      </SectionReveal>
+    </div>
+  </section>
+
+  <CTASection
+    heading="Let the Experts Wield the Platform."
+    body="Book a free audit and we'll show you exactly how GoHighLevel maps to your business — and what we'd build first."
+  />
+<Layout></Layout>
+</BaseLayout>

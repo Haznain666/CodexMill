@@ -1,0 +1,265 @@
+---
+layout: false
+
+import SectionReveal from '../components/SectionReveal.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+---
+
+<section id="portfolio-section" class="relative w-full text-white flex flex-col items-center justify-start overflow-hidden mt-12 select-none">
+    <div class="container-page mb-8">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="The brochure trap"
+          heading="Most Small-Business Sites"
+          highlight="Just Sit There."
+          subhead="Good design isn't enough if your site doesn't convert. Without automated follow-ups or clear booking paths, you're losing leads every day. We’ve designed a better way to capture and convert your traffic. Take a look:"
+        />
+      </SectionReveal>
+    </div>
+
+
+  <div id="portfolio-sticky-wrapper" class="relative w-full flex flex-1 items-center justify-center px-4 md:px-8">
+    
+    <div class="relative w-full max-w-6xl aspect-[4/3] md:aspect-video rounded-xl md:rounded-xl shadow-xl overflow-hidden">
+      
+      <!-- Slide 1 (Base layer) -->
+      <div class="portfolio-slide absolute inset-0 w-full h-full will-change-transform z-[1]">
+        <div class="slide-overlay relative absolute inset-0 bg-black/0 transition-colors duration-300 pointer-events-none"></div>
+        
+<a
+  href="https://furryfriends.codexmill.com/"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <h1 class="absolute top-[110px] left-1/2 -translate-x-1/2 flex justify-center font-normal font-['Inter_Variable'] text-sky-400 underline">
+    furryfriends.codexmill.com
+  </h1>
+</a>
+
+       <img 
+          src="/furryFriendsBanner.png" 
+          alt="Furry Friends Portfolio Banner" 
+          class="w-full h-full object-cover select-none pointer-events-none"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      <!-- Slide 2 (Initially below viewport) -->
+      <div class="portfolio-slide absolute inset-0 w-full h-full will-change-transform z-[2]">
+        <div class="slide-overlay relative absolute inset-0 bg-black/0 transition-colors duration-300 pointer-events-none"></div>
+          <a
+            href="https://greenyards.codexmill.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h1 class="absolute top-[110px] left-1/2 -translate-x-1/2 flex justify-center font-normal font-['Inter_Variable'] text-sky-400 underline">
+              greenyards.codexmill.com
+            </h1>
+          </a>        <img 
+          src="/greenYardsBanner.png" 
+          alt="Green Yards Portfolio Banner" 
+          class="w-full h-full object-cover select-none pointer-events-none"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      <!-- Slide 3 (Initially below viewport) -->
+      <div class="portfolio-slide absolute inset-0 w-full h-full will-change-transform z-[3]">
+        <div class="slide-overlay relative absolute inset-0 bg-black/0 transition-colors duration-300 pointer-events-none"></div>
+          <a
+            href="https://mareeaesthetics.codexmill.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h1 class="absolute top-[110px] left-1/2 -translate-x-1/2 flex justify-center font-normal font-['Inter_Variable'] text-sky-400 underline">
+              mareeaesthetics.codexmill.com
+            </h1>
+          </a>        
+          <img 
+          src="/medSpaBanner.png" 
+          alt="Med Spa Portfolio Banner" 
+          class="w-full h-full object-cover select-none pointer-events-none"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+    </div>
+
+    <div id="portfolio-pagination" class="hidden md:flex fixed right-8 lg:right-12 top-1/2 -translate-y-1/2 z-40 flex-col gap-6 items-center justify-center mix-blend-difference pointer-events-none">
+      <div class="portfolio-dot w-2 h-2 rounded-full bg-white transition-all duration-500 ease-out" data-index="0"></div>
+      <div class="portfolio-dot w-2 h-2 rounded-full bg-white opacity-25 transition-all duration-500 ease-out" data-index="1"></div>
+      <div class="portfolio-dot w-2 h-2 rounded-full bg-white opacity-25 transition-all duration-500 ease-out" data-index="2"></div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  @media (max-width: 767px) {
+    #portfolio-section {
+      overflow: visible !important;
+      height: auto !important;
+    }
+    #portfolio-sticky-wrapper {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1.5rem !important;
+      padding: 0 1rem !important;
+      height: auto !important;
+    }
+    #portfolio-sticky-wrapper > div {
+      position: relative !important;
+      aspect-ratio: 4/3 !important;
+      overflow: visible !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      height: auto !important;
+    }
+    .portfolio-slide {
+      position: relative !important;
+      transform: none !important;
+      margin-bottom: 1rem;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border: 1px solid rgba(64, 64, 64, 0.4);
+    }
+    .portfolio-slide:last-child {
+      margin-bottom: 0;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function initPortfolioAnimation() {
+    const section = document.getElementById('portfolio-section');
+    const wrapper = document.getElementById('portfolio-sticky-wrapper');
+    const slides = document.querySelectorAll('.portfolio-slide');
+    const dots = document.querySelectorAll('.portfolio-dot');
+
+    if (!section || !wrapper || slides.length < 3) return;
+
+    // Clean up previous triggers
+    ScrollTrigger.getAll().forEach(trigger => {
+      if (trigger.trigger === section || trigger.trigger === wrapper) {
+        trigger.kill(true);
+      }
+    });
+
+    let mm = gsap.matchMedia();
+
+    mm.add("(min-width: 768px)", () => {
+      // ===== INITIAL STATES =====
+      // Slide 1: visible, no overlay
+      gsap.set(slides[0], { yPercent: 0, scale: 1 });
+      gsap.set(slides[0].querySelector('.slide-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
+      
+      // Slide 2: below viewport, no overlay
+      gsap.set(slides[1], { yPercent: 100, scale: 1 });
+      gsap.set(slides[1].querySelector('.slide-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
+      
+      // Slide 3: below viewport, no overlay
+      gsap.set(slides[2], { yPercent: 100, scale: 1 });
+      gsap.set(slides[2].querySelector('.slide-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
+
+      // ===== PAGINATION UPDATE =====
+      const updateDots = (progress) => {
+        // Calculate which slide is active based on timeline progress
+        // Timeline structure: 0-0.33 = Slide 1, 0.33-0.66 = Slide 2, 0.66-1.0 = Slide 3
+        let activeIndex = 0;
+        if (progress < 0.33) activeIndex = 0;
+        else if (progress < 0.66) activeIndex = 1;
+        else activeIndex = 2;
+
+        dots.forEach((dot, index) => {
+          if (index === activeIndex) {
+            dot.classList.add('scale-[1.4]', 'shadow-[0_0_15px_rgba(255,255,255,1)]');
+            dot.classList.remove('opacity-25');
+          } else {
+            dot.classList.remove('scale-[1.4]', 'shadow-[0_0_15px_rgba(255,255,255,1)]');
+            dot.classList.add('opacity-25');
+          }
+        });
+      };
+
+      // ===== MASTER TIMELINE =====
+      const masterTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "+=400%",
+          pin: true,
+          scrub: 1.2,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          fastScrollEnd: true,
+          onUpdate: (self) => updateDots(self.progress)
+        }
+      });
+
+      // --- PHASE 1: Slide 2 enters (0% to 33% of scroll) ---
+      masterTimeline
+        .to(slides[1], { 
+          yPercent: 0, 
+          duration: 1,
+          ease: "power2.out" 
+        }, 0)
+        .to(slides[0], { 
+          scale: 0.92, 
+          duration: 1,
+          ease: "power2.out" 
+        }, 0)
+        .to(slides[0].querySelector('.slide-overlay'), {
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          duration: 1,
+          ease: "power2.out"
+        }, 0);
+
+      // --- PHASE 2: Slide 3 enters (33% to 66% of scroll) ---
+      masterTimeline
+        .to(slides[2], { 
+          yPercent: 0, 
+          duration: 1,
+          ease: "power2.out" 
+        }, 1)
+        .to(slides[1], { 
+          scale: 0.92, 
+          duration: 1,
+          ease: "power2.out" 
+        }, 1)
+        .to(slides[1].querySelector('.slide-overlay'), {
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          duration: 1,
+          ease: "power2.out"
+        }, 1);
+
+      // --- PHASE 3: Hold final state (66% to 100% of scroll) ---
+      masterTimeline.to({}, { duration: 1 });
+
+      return () => {
+        gsap.set(slides, { clearProps: "all" });
+        slides.forEach(slide => {
+          const overlay = slide.querySelector('.slide-overlay');
+          if (overlay) gsap.set(overlay, { clearProps: "all" });
+        });
+      };
+    });
+  }
+
+  // Astro page-load lifecycle
+  document.addEventListener('astro:page-load', initPortfolioAnimation);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initPortfolioAnimation();
+  } else {
+    document.addEventListener('DOMContentLoaded', initPortfolioAnimation);
+  }
+</script>

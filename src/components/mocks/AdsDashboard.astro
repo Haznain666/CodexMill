@@ -1,0 +1,68 @@
+---
+/**
+ * AdsDashboard — stylised (NOT real-product) ad + analytics dashboard with an
+ * attribution row (ad → lead → pipeline → booked). For the Digital Marketing
+ * page signature.
+ */
+import Icon from '../Icon.astro';
+
+const stages = [
+  { icon: 'megaphone', label: 'Ad', accent: 'circuit' },
+  { icon: 'bolt', label: 'Lead', accent: 'forge' },
+  { icon: 'pipeline', label: 'Pipeline', accent: 'navy' },
+  { icon: 'calendar', label: 'Booked', accent: 'green' },
+];
+const chip: Record<string, string> = {
+  forge: 'bg-forge/10 text-forge',
+  circuit: 'bg-circuit/10 text-circuit',
+  navy: 'bg-navy/5 text-navy',
+  green: 'bg-[#28C840]/10 text-[#1FA34A]',
+};
+const line = [30, 45, 38, 60, 55, 78, 72, 92];
+const pts = line.map((v, i) => `${(i / (line.length - 1)) * 100},${100 - v}`).join(' ');
+---
+
+<div class="space-y-4 p-5">
+  <div class="flex items-center justify-between">
+    <p class="font-display text-base font-bold text-navy">Ad Performance</p>
+    <span class="rounded-full bg-[#28C840]/10 px-2.5 py-1 text-[0.65rem] font-bold text-[#1FA34A]">+34% leads</span>
+  </div>
+
+  <!-- metrics -->
+  <div class="grid grid-cols-3 gap-2.5">
+    <div class="rounded-xl bg-mist p-3"><p class="text-[0.62rem] uppercase tracking-wide text-cool">Spend</p><p class="font-display text-lg font-extrabold text-navy">$2.4k</p></div>
+    <div class="rounded-xl bg-mist p-3"><p class="text-[0.62rem] uppercase tracking-wide text-cool">Leads</p><p class="font-display text-lg font-extrabold text-circuit">128</p></div>
+    <div class="rounded-xl bg-mist p-3"><p class="text-[0.62rem] uppercase tracking-wide text-cool">Cost / job</p><p class="font-display text-lg font-extrabold text-forge">$31</p></div>
+  </div>
+
+  <!-- trend line -->
+  <div class="rounded-xl border border-hairline p-3">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="h-16 w-full" aria-hidden="true">
+      <defs>
+        <linearGradient id="ad-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F26419" stop-opacity="0.25" />
+          <stop offset="1" stop-color="#F26419" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon points={`0,100 ${pts} 100,100`} fill="url(#ad-fill)" />
+      <polyline points={pts} fill="none" stroke="#F26419" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+    </svg>
+  </div>
+
+  <!-- attribution flow -->
+  <div class="flex items-center justify-between rounded-xl bg-mist px-2 py-2.5">
+    {
+      stages.map((s, i) => (
+        <>
+          <div class="flex flex-col items-center gap-1">
+            <span class={`grid h-8 w-8 place-items-center rounded-lg ${chip[s.accent]}`}>
+              <Icon name={s.icon as any} size={16} />
+            </span>
+            <span class="text-[0.58rem] font-semibold text-slate">{s.label}</span>
+          </div>
+          {i < stages.length - 1 && <span class="text-cool">→</span>}
+        </>
+      ))
+    }
+  </div>
+</div>

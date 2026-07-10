@@ -1,0 +1,160 @@
+---
+/**
+ * INTEGRATIONS — overview / hub. Links to each integration detail page.
+ * Kept intentionally light — the deep marketing lives on each detail page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import CTASection from '../../components/CTASection.astro';
+import SectionReveal from '../../components/SectionReveal.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import GlassCard from '../../components/GlassCard.astro';
+import Icon from '../../components/Icon.astro';
+import Button from '../../components/Button.astro';
+import IntegrationsOtherRow from '../../components/IntegrationsOtherRow.astro';
+import IntegrationSyncFlow from '../../components/mocks/IntegrationSyncFlow.astro';
+import { GET_STARTED_URL, CTA_LABEL } from '../../config/site';
+
+const meta = {
+  title: 'GoHighLevel Integrations | CodexMill',
+  description:
+    'CodexMill wires the tools you already use — Housecall Pro, Jobber, and more — into GoHighLevel with real, two-way sync and no duct tape.',
+};
+
+const featured = [
+  {
+    href: '/integrations/housecall-pro',
+    title: 'Housecall Pro + GHL',
+    kicker: 'Field ops · CRM · Marketing',
+    body: 'Two-way sync between Housecall Pro and GoHighLevel — customers, jobs, estimates, invoices, and every follow-up event you want automated.',
+    tags: ['Real-time sync', 'Review requests', 'Reactivation flows'],
+    accent: 'circuit' as const,
+  },
+  {
+    href: '/integrations/jobber',
+    title: 'Jobber + GHL',
+    kicker: 'Clients · Quotes · Jobs',
+    body: 'Clients, quotes, jobs, and invoices flow both ways — with GHL running the quote follow-up, reminders, reviews, and rebook sequences on top.',
+    tags: ['Direct integration', 'Quote follow-up', 'Seasonal rebooking'],
+    accent: 'forge' as const,
+  },
+];
+
+const benefits = [
+  { icon: 'workflow', title: 'One record per customer', body: 'No more duplicate contacts drifting between systems.' },
+  { icon: 'bolt', title: 'Real-time triggers', body: 'Every event pushes to GHL and fires the right sequence instantly.' },
+  { icon: 'shield', title: 'Done-for-you build', body: 'We scope, build, test, and maintain — you keep running the business.' },
+  { icon: 'refresh', title: 'Ongoing support', body: 'When either platform ships a change, we handle it — not you.' },
+];
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+
+  <Hero
+    eyebrow="Integrations"
+    headline="The Tools You Use, Wired"
+    highlight="Into GoHighLevel."
+    subhead="CodexMill builds real, two-way integrations between GHL and the platforms your team already runs — so ops, sales, and marketing finally share one view."
+    trustLine="Direct integrations · No Zapier tax · Built and maintained by CodexMill"
+    secondaryLabel="See featured builds"
+    secondaryHref="#featured"
+  >
+    <div slot="visual" class="relative mx-auto max-w-lg">
+      <IntegrationSyncFlow leftLabel="Your ops tool" leftAccent="circuit" leftKicker="Housecall Pro · Jobber · more" />
+    </div>
+  </Hero>
+
+  <!-- Featured integrations -->
+  <section id="featured" class="bg-white py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Featured integrations"
+          heading="Detailed Builds We Ship"
+          highlight="Every Week."
+          subhead="Each of these has a dedicated page with scope, sync fields, automations, and a booking flow. Start here."
+        />
+      </SectionReveal>
+
+      <div class="mt-14 grid gap-6 lg:grid-cols-2">
+        {
+          featured.map((f, i) => (
+            <SectionReveal delay={i * 120}>
+              <a
+                href={f.href}
+                class="group relative flex h-full flex-col justify-between rounded-3xl border border-hairline bg-white p-8 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-forge/25 hover:shadow-card"
+              >
+                <div>
+                  <div class="flex items-center gap-3">
+                    <span class={`grid h-12 w-12 place-items-center rounded-xl ${f.accent === 'forge' ? 'bg-forge/10 text-forge' : 'bg-circuit/10 text-circuit'}`}>
+                      <Icon name="layers" size={24} />
+                    </span>
+                    <div>
+                      <p class="font-display text-2xl font-extrabold text-navy">{f.title}</p>
+                      <p class="text-xs font-medium uppercase tracking-widest text-cool">{f.kicker}</p>
+                    </div>
+                  </div>
+                  <p class="mt-5 text-[0.98rem] leading-relaxed text-slate">{f.body}</p>
+                  <div class="mt-5 flex flex-wrap gap-2">
+                    {
+                      f.tags.map((t) => (
+                        <span class="rounded-full bg-mist px-3 py-1 text-xs font-semibold text-navy ring-1 ring-hairline">
+                          {t}
+                        </span>
+                      ))
+                    }
+                  </div>
+                </div>
+                <span class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-forge transition group-hover:gap-3">
+                  See the {f.title} build
+                  <Icon name="arrow-right" size={18} />
+                </span>
+              </a>
+            </SectionReveal>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Why go direct -->
+  <section class="bg-mist py-20 sm:py-24">
+    <div class="container-page">
+      <SectionReveal>
+        <SectionHeading
+          eyebrow="Why an integration, not a duct-tape"
+          heading="One Source of Truth,"
+          highlight="Two Working Systems."
+          subhead="A real integration keeps ops and marketing in the same story. Nobody keys the same customer in twice; nobody misses a rebook because it lived in the other tab."
+        />
+      </SectionReveal>
+
+      <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          benefits.map((b, i) => (
+            <SectionReveal delay={(i % 4) * 90}>
+              <GlassCard class="h-full p-6" hover>
+                <span class="grid h-11 w-11 place-items-center rounded-xl bg-forge-blue-soft text-navy ring-1 ring-hairline">
+                  <Icon name={b.icon as any} size={22} />
+                </span>
+                <p class="mt-4 font-display text-lg font-bold text-navy">{b.title}</p>
+                <p class="mt-1.5 text-[0.95rem] leading-relaxed text-slate">{b.body}</p>
+              </GlassCard>
+            </SectionReveal>
+          ))
+        }
+      </div>
+
+      <div class="mt-12 flex justify-center">
+        <Button href={GET_STARTED_URL} size="lg">{CTA_LABEL}</Button>
+      </div>
+    </div>
+  </section>
+
+  <IntegrationsOtherRow />
+
+  <CTASection
+    heading="Ready to make GHL play nicely with your stack?"
+    body="Book a free audit — bring the two tools you want connected, we'll bring the plan."
+  />
+</BaseLayout>

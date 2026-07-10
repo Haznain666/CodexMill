@@ -1,0 +1,60 @@
+---
+/**
+ * FAQ — accessible accordion (native <details>). Reused on Home + industry pages.
+ * Emits FAQPage JSON-LD when `schema` is true (SEO, Phase 8).
+ */
+import SectionReveal from './SectionReveal.astro';
+import SectionHeading from './SectionHeading.astro';
+
+export interface QA {
+  q: string;
+  a: string;
+}
+interface Props {
+  heading?: string;
+  highlight?: string;
+  items: QA[];
+  schema?: boolean;
+  class?: string;
+}
+const { heading = 'Questions, Answered.', highlight, items, schema = false, class: className = '' } =
+  Astro.props;
+
+const jsonLd = schema
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: items.map((it) => ({
+        '@type': 'Question',
+        name: it.q,
+        acceptedAnswer: { '@type': 'Answer', text: it.a },
+      })),
+    }
+  : null;
+---
+
+<section class={`bg-white py-20 sm:py-24 ${className}`}>
+  <div class="container-page">
+    <SectionReveal>
+      <SectionHeading heading={heading} highlight={highlight} />
+    </SectionReveal>
+    <div class="mx-auto mt-10 max-w-3xl divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-white shadow-soft">
+      {
+        items.map((it) => (
+          <details class="group">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left font-display text-lg font-bold text-navy transition hover:text-forge">
+              {it.q}
+              <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-hairline text-cool transition group-open:rotate-45 group-open:border-forge group-open:text-forge" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+              </span>
+            </summary>
+            <div class="px-6 pb-5 text-[0.97rem] leading-relaxed text-slate">{it.a}</div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+</section>

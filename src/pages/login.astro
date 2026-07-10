@@ -1,0 +1,155 @@
+---
+/**
+ * LOGIN — client sign-in page. UI ONLY: no auth, no validation, no backend call.
+ * The form submit is intercepted client-side purely to stop a page reload;
+ * wire up real authentication here later. noindex until that lands.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import FormField from '../components/discovery/FormField.astro';
+import AmbientBackground from '../components/AmbientBackground.astro';
+import { GET_STARTED_URL } from '../config/site';
+
+const inputBase =
+  'w-full rounded-xl border border-hairline bg-white px-4 py-3 text-[0.95rem] text-navy placeholder:text-cool transition focus:border-forge focus:outline-none focus:ring-2 focus:ring-forge/20';
+---
+
+<BaseLayout
+  title="Log In"
+  description="Sign in to your CodexMill account."
+  noindex
+>
+  <section class="relative overflow-hidden bg-mist py-14 sm:py-20">
+    <AmbientBackground />
+    <div class="container-page relative">
+      <div class="mx-auto mb-8 max-w-md text-center">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ember">Welcome Back</p>
+        <h1 class="mt-4 text-display-sm">Sign in to your <span class="text-gradient">account.</span></h1>
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          Access your CodexMill dashboard, pipelines, and reporting.
+        </p>
+      </div>
+
+      <div class="mx-auto w-full max-w-md">
+        <div class="rounded-2xl border border-hairline bg-white p-6 shadow-card sm:p-8">
+          <!-- Form-level error space — hidden until real auth wires it up -->
+          <div
+            id="login-error"
+            role="alert"
+            aria-live="polite"
+            class="mb-5 hidden items-start gap-2.5 rounded-xl border border-[#D92D20]/30 bg-[#D92D20]/5 px-4 py-3 text-sm font-medium text-[#D92D20]"
+          >
+            <span data-login-error-text>We couldn't sign you in. Please check your details and try again.</span>
+          </div>
+
+          <form id="login-form" novalidate class="flex flex-col gap-5">
+            <FormField label="Email Address" name="email" required>
+              <div class="relative">
+                <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cool">
+                  <Icon name="inbox" size={18} />
+                </span>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="jane@business.com"
+                  class={`${inputBase} pl-11`}
+                />
+              </div>
+            </FormField>
+
+            <FormField label="Password" name="password" required>
+              <div class="relative">
+                <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cool">
+                  <Icon name="lock" size={18} />
+                </span>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Enter your password"
+                  class={`${inputBase} pl-11 pr-11`}
+                />
+                <button
+                  type="button"
+                  id="toggle-password"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                  aria-controls="password"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-cool transition hover:text-navy focus-visible:outline-none"
+                >
+                  <span data-icon-show><Icon name="eye" size={18} /></span>
+                  <span data-icon-hide class="hidden"><Icon name="eye-off" size={18} /></span>
+                </button>
+              </div>
+            </FormField>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <label for="rememberMe" class="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-navy">
+                <span
+                  class="relative grid h-5 w-5 shrink-0 place-items-center rounded-[6px] border-2 border-cool transition"
+                  data-remember-box
+                >
+                  <input id="rememberMe" name="rememberMe" type="checkbox" class="peer sr-only" />
+                  <Icon name="check" size={13} weight={3} class="hidden text-white" data-remember-check />
+                </span>
+                Remember me
+              </label>
+
+              <a href="#" class="text-sm font-semibold text-forge transition hover:text-ember">
+                Forgot Password?
+              </a>
+            </div>
+
+            <Button type="submit" variant="primary" size="lg" class="mt-1 w-full">Log In</Button>
+          </form>
+
+          <p class="mt-6 text-center text-sm text-slate">
+            New to CodexMill?
+            <a href={GET_STARTED_URL} class="font-semibold text-forge transition hover:text-ember">Book your free audit</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // --- Show/Hide password toggle ---
+  const toggleBtn = document.getElementById('toggle-password');
+  const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+  const iconShow = toggleBtn?.querySelector('[data-icon-show]');
+  const iconHide = toggleBtn?.querySelector('[data-icon-hide]');
+
+  toggleBtn?.addEventListener('click', () => {
+    if (!passwordInput) return;
+    const isHidden = passwordInput.type === 'password';
+    passwordInput.type = isHidden ? 'text' : 'password';
+    iconShow?.classList.toggle('hidden', isHidden);
+    iconHide?.classList.toggle('hidden', !isHidden);
+    toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    toggleBtn.setAttribute('aria-pressed', String(isHidden));
+  });
+
+  // --- Remember me checkbox visual state ---
+  const rememberInput = document.getElementById('rememberMe') as HTMLInputElement | null;
+  const rememberBox = document.querySelector('[data-remember-box]');
+  const rememberCheck = document.querySelector('[data-remember-check]');
+
+  rememberInput?.addEventListener('change', () => {
+    const on = rememberInput.checked;
+    rememberBox?.classList.toggle('border-forge', on);
+    rememberBox?.classList.toggle('bg-forge', on);
+    rememberBox?.classList.toggle('border-cool', !on);
+    rememberCheck?.classList.toggle('hidden', !on);
+  });
+
+  // --- No backend yet: just stop the page from reloading on submit ---
+  const form = document.getElementById('login-form');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+  });
+</script>

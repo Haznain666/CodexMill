@@ -1,0 +1,65 @@
+---
+/**
+ * Logo — placeholder navy lockup (monogram badge + wordmark).
+ * TODO[Ray]: swap this inline SVG for the real CodexMill logo asset.
+ * Use the dark/navy version on the light theme (CLAUDE.md §4.3).
+ */
+interface Props {
+  /** show wordmark next to the badge (header/footer) vs. badge only (favicon/mobile) */
+  variant?: 'lockup' | 'badge';
+  /** render light (for navy/dark backgrounds) */
+  light?: boolean;
+  class?: string;
+}
+const { variant = 'lockup', light = false, class: className = '' } = Astro.props;
+const ink = light ? '#FFFFFF' : '#0B1A30';
+const sub = light ? 'rgba(255,255,255,0.72)' : '#7C8A99';
+---
+
+<span class={`inline-flex items-center gap-2.5 ${className}`} aria-label="CodexMill">
+  {/* Monogram badge — stylized "CM" mill/codex mark (placeholder) */}
+  <svg
+    width="36"
+    height="36"
+    viewBox="0 0 36 36"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    class="shrink-0"
+  >
+    <rect x="1.5" y="1.5" width="33" height="33" rx="9" stroke={ink} stroke-width="1.5" opacity="0.18"></rect>
+    <rect width="36" height="36" rx="10" fill="url(#cm-grad)" opacity={light ? '0.18' : '0.10'}></rect>
+    <path
+      d="M14.5 11.5a6.5 6.5 0 1 0 0 13"
+      stroke={ink}
+      stroke-width="2.6"
+      stroke-linecap="round"
+    ></path>
+    <path
+      d="M20.5 24.5v-13l4 7 4-7v13"
+      stroke="#F26419"
+      stroke-width="2.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    ></path>
+    <defs>
+      <linearGradient id="cm-grad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#F26419"></stop>
+        <stop offset="1" stop-color="#2E9BE6"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  {
+    variant === 'lockup' && (
+      <span class="flex flex-col leading-none">
+        <span class="font-display text-[1.15rem] font-extrabold tracking-tight" style={`color:${ink}`}>
+          Codex<span style="color:#F26419">Mill</span>
+        </span>
+        <span class="text-[0.6rem] font-semibold uppercase tracking-[0.18em]" style={`color:${sub}`}>
+          Automation &amp; Growth
+        </span>
+      </span>
+    )
+  }
+</span>

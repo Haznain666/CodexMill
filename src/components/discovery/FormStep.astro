@@ -1,0 +1,41 @@
+---
+/**
+ * FormStep — one view of the wizard: numbered circle + title + subtitle, a
+ * divider, then the step's fields (slot). The wizard shows one at a time.
+ * Pass `icon` (e.g. "check") instead of a number for closing/result screens.
+ */
+import Icon from '../Icon.astro';
+
+interface Props {
+  /** 1-based step number shown in the circle (omit when using `icon`) */
+  step?: number;
+  title: string;
+  subtitle?: string;
+  /** Icon name to show instead of a step number (closing/result screens) */
+  icon?: string;
+  /** value used by the engine to identify/route this view */
+  id: string;
+  /** hidden until the engine activates it */
+  active?: boolean;
+  class?: string;
+}
+const { step, title, subtitle, icon, id, active = false, class: className = '' } = Astro.props;
+---
+
+<section data-step={id} class={`${active ? '' : 'hidden'} ${className}`}>
+  <header class="flex items-start gap-3.5">
+    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-forge text-sm font-bold text-white shadow-soft">
+      {icon ? <Icon name={icon as any} size={18} weight={2.6} /> : step}
+    </span>
+    <div class="pt-0.5">
+      <h2 class="font-display text-xl font-extrabold leading-tight text-navy">{title}</h2>
+      {subtitle && <p class="mt-0.5 text-sm text-slate">{subtitle}</p>}
+    </div>
+  </header>
+
+  <div class="my-6 h-px bg-hairline"></div>
+
+  <div class="flex flex-col gap-5">
+    <slot />
+  </div>
+</section>

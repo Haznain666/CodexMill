@@ -1,0 +1,64 @@
+---
+/**
+ * Button — the site's one button. Renders <a> when href is given, else <button>.
+ * Variants: primary (Forge CTA), secondary (navy outline), ghost, white (on navy bands).
+ * External http(s) links auto-get target=_blank + rel. Used for every BOOKING_URL CTA.
+ */
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'white';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+  type?: 'button' | 'submit';
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  class: className = '',
+  type = 'button',
+  ...rest
+} = Astro.props;
+
+const base =
+  'group relative inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-tight transition duration-200 ease-out focus-visible:outline-none disabled:opacity-60';
+
+const sizes: Record<string, string> = {
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-5 py-2.5 text-[0.95rem]',
+  lg: 'px-7 py-3.5 text-base',
+};
+
+const variants: Record<string, string> = {
+  // Forge Orange primary — brightens + lifts + glow on hover
+  primary:
+    'bg-forge text-white shadow-soft hover:bg-forge-600 hover:shadow-glow hover:-translate-y-0.5 active:translate-y-0',
+  // Navy outline on light
+  secondary:
+    'border border-navy/15 bg-white text-navy shadow-soft hover:border-navy/30 hover:-translate-y-0.5 hover:shadow-card',
+  // Minimal text button
+  ghost: 'text-navy hover:text-forge',
+  // For navy/dark bands
+  white:
+    'bg-white text-navy shadow-soft hover:-translate-y-0.5 hover:shadow-card hover:bg-mist',
+};
+
+const cls = `${base} ${sizes[size]} ${variants[variant]} ${className}`;
+
+const isExternal = typeof href === 'string' && /^https?:\/\//.test(href);
+const externalAttrs = isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+{
+  href ? (
+    <a href={href} class={cls} {...externalAttrs} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={cls} {...rest}>
+      <slot />
+    </button>
+  )
+}

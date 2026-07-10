@@ -1,0 +1,33 @@
+---
+/**
+ * THANK-YOU — post-booking confirmation (CLAUDE.md §5 standalone). noindex.
+ * Use as the redirect/confirmation destination after the GHL booking flow if desired.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout title="Thank You" description="Thanks for booking your free automation audit." noindex>
+  <section class="relative overflow-hidden bg-white">
+    <div class="pointer-events-none absolute inset-0 -z-10 opacity-60" aria-hidden="true">
+      <div class="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-forge/10 blur-3xl"></div>
+    </div>
+    <div class="container-page flex min-h-[70vh] flex-col items-center justify-center py-20 text-center">
+      <span class="grid h-20 w-20 place-items-center rounded-full bg-forge-blue text-white shadow-glow">
+        <Icon name="check" size={40} weight={2.6} />
+      </span>
+      <h1 class="mt-8 max-w-2xl text-display-sm sm:text-display">You're Booked. <span class="text-gradient">Talk Soon.</span></h1>
+      <p class="mt-5 max-w-xl text-lg leading-relaxed text-slate">
+        Thanks for booking your free automation audit. Keep an eye on your inbox and texts — you'll
+        get a confirmation shortly. We'll come ready to show you exactly where leads are slipping
+        through and the system that fixes it.
+      </p>
+      <div class="mt-9 flex flex-wrap justify-center gap-3">
+        <Button href="/" variant="primary" size="lg">Back to Home</Button>
+        <Button href="/ghl" variant="secondary" size="lg">Explore GoHighLevel</Button>
+      </div>
+      <p class="mt-8 text-sm text-cool">Need to reschedule? Reply to your confirmation and we'll sort it out.</p>
+    </div>
+  </section>
+</BaseLayout>

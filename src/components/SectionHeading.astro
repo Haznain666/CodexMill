@@ -1,0 +1,46 @@
+---
+/**
+ * SectionHeading — eyebrow + heading + optional subhead, with the signature
+ * one-word gradient highlight available via {{...}} markup in `heading`.
+ * Use the named `highlight` prop to gradient-style a trailing phrase instead.
+ */
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  /** trailing phrase rendered with the orange→blue gradient */
+  highlight?: string;
+  subhead?: string;
+  align?: 'center' | 'left';
+  /** dark band (navy) -> light text */
+  light?: boolean;
+  class?: string;
+}
+const {
+  eyebrow,
+  heading,
+  highlight,
+  subhead,
+  align = 'center',
+  light = false,
+  class: className = '',
+} = Astro.props;
+
+const alignCls = align === 'center' ? 'mx-auto text-center items-center' : 'text-left items-start';
+const headColor = light ? 'text-white' : 'text-navy';
+const subColor = light ? 'text-white/70' : 'text-slate';
+---
+
+<div class={`flex max-w-3xl flex-col gap-4 ${alignCls} ${className}`}>
+  {
+    eyebrow && (
+      <span class:list={['inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]', light ? 'text-forge-500' : 'text-ember']}>
+        {eyebrow}
+      </span>
+    )
+  }
+  <h2 class={`text-display-sm sm:text-[2.75rem] ${headColor}`}>
+    {heading}
+    {highlight && <> <span class="text-gradient">{highlight}</span></>}
+  </h2>
+  {subhead && <p class={`max-w-2xl text-lg leading-relaxed ${subColor}`}>{subhead}</p>}
+</div>

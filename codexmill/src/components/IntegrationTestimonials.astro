@@ -1,0 +1,113 @@
+---
+/**
+ * IntegrationTestimonials — three-across placeholder review cards.
+ * Names / businesses are labeled placeholders per CLAUDE.md §9 —
+ * Ray to replace with real approved testimonials before publishing.
+ */
+import SectionReveal from './SectionReveal.astro';
+import SectionHeading from './SectionHeading.astro';
+import Icon from './Icon.astro';
+
+export interface Quote {
+  name: string;
+  role: string;
+  body: string;
+  image: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  highlight?: string;
+  items?: Quote[];
+  class?: string;
+}
+
+// TODO[Ray]: swap for real, approved client quotes before launch.
+const defaults: Quote[] = [
+  {
+    image: '/a.png',
+    name: 'Owner · Michael Carter',
+    role: 'HVAC · Carter Heating & Air',
+    body: 'The two systems finally talk. Every call, every quote, every job — it all lands in one pipeline, and we stopped losing track of who to follow up with.',
+  },
+  {
+    image: '/b.png',
+    name: 'Ops Lead · Sarah Mitchell',
+    role: 'Home Services · Shamrock Hvac',
+    body: 'We had duplicate contacts, missed rebookings, and a jobs board no one trusted. The build wiped all three out in about two weeks.',
+  },
+  {
+    image: '/c.png',
+    name: 'Founder · David Reynolds',
+    role: 'Lawn Care · Green Horizon Lawn Care',
+    body: 'The reactivation flows alone paid for the whole thing in the first 60 days. Old customers came back without any of us picking up the phone.',
+  },
+  {
+    image: '/d.png',
+    name: 'Owner · Amanda J',
+    role: 'Roofing · Walker Roofing Solutions',
+    body: 'Estimate sent, sequence starts. Estimate accepted, pipeline moves. Job closed, review request goes out. It just runs.',
+  },
+  {
+    image: '/e.png',
+    name: 'GM · Ryan Thompson',
+    role: 'Plumbing · Precision Plumbing Co',
+    body: 'The team no longer has to double-enter anything. Field ops updates a job and marketing sees it immediately in the CRM.',
+  },
+  {
+    image: '/f.png',
+    name: 'Owner · Elena Lucon',
+    role: 'Real Estate · Brooks Property Services',
+    body: 'Straightforward build, no jargon, and the whole thing was live and behaving before I expected the kickoff to be done.',
+  },
+];
+
+const {
+  eyebrow = 'What owners are saying',
+  heading = 'Real results,',
+  highlight = 'not screenshots.',
+  items = defaults,
+  class: className = '',
+} = Astro.props;
+---
+
+<section class={`bg-white py-20 sm:py-24 ${className}`}>
+  <div class="container-page">
+    <SectionReveal>
+      <SectionHeading eyebrow={eyebrow} heading={heading} highlight={highlight} />
+    </SectionReveal>
+
+    <div class="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {
+        items.map((q, i) => (
+          <SectionReveal delay={(i % 3) * 90}>
+            <figure class="flex h-full flex-col rounded-2xl border border-hairline bg-white p-6 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-forge/20 hover:shadow-card">
+              <div class="flex items-center gap-1 text-forge" aria-label="5 star review">
+                {Array.from({ length: 5 }).map(() => (
+                  <Icon name="star" size={16} />
+                ))}
+              </div>
+              <blockquote class="mt-4 flex-1 text-[0.98rem] leading-relaxed text-slate">
+                &ldquo;{q.body}&rdquo;
+              </blockquote>
+              <figcaption class="mt-6 flex items-center gap-3 border-t border-hairline pt-5">
+                <span class="grid h-11 w-11 place-items-center rounded-full bg-forge-blue-soft font-display text-sm font-bold text-navy ring-1 ring-hairline">
+                  <img src={q.image} style="border-radius: 50%;">
+                </span>
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold text-navy">{q.name}</p>
+                  <p class="truncate text-xs text-cool">{q.role}</p>
+                </div>
+              </figcaption>
+            </figure>
+          </SectionReveal>
+        ))
+      }
+    </div>
+
+    <p class="mt-8 text-center text-xs text-cool">
+      Placeholder review cards — real, approved client quotes will replace these before launch.
+    </p>
+  </div>
+</section>

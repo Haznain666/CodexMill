@@ -1,0 +1,94 @@
+---
+/**
+ * IntegrationProcess — navy full-bleed band showing how CodexMill delivers
+ * an integration, 6 numbered stages laid out in a 3+3 grid.
+ * Shared between the Housecall Pro and Jobber integration pages.
+ */
+import SectionReveal from './SectionReveal.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Stage {
+  n: string;
+  title: string;
+  body: string;
+}
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  highlight?: string;
+  subhead?: string;
+  stages?: Stage[];
+  class?: string;
+}
+
+const defaults: Stage[] = [
+  {
+    n: '01',
+    title: 'Discovery Call',
+    body: 'We map the exact points where jobs, customers, and follow-up slip through the cracks between the two systems today.',
+  },
+  {
+    n: '02',
+    title: 'Field Mapping',
+    body: 'We match every field, tag, and pipeline stage across your GHL account and your operations tool — no orphaned data.',
+  },
+  {
+    n: '03',
+    title: 'Build',
+    body: 'Our team stands up the two-way sync, the workflows, and the automations that will actually run against your live data.',
+  },
+  {
+    n: '04',
+    title: 'Test',
+    body: 'We run real records end-to-end — dummy jobs, quotes, invoices — until every path is proven and edge cases behave.',
+  },
+  {
+    n: '05',
+    title: 'Deployment',
+    body: 'We flip it live on your accounts, monitor the first days closely, and clean up anything that drifts.',
+  },
+  {
+    n: '06',
+    title: 'Optimization',
+    body: 'Once your team is using it, we tune the sequences, timing, and pipelines against what your numbers are actually showing.',
+  },
+];
+
+const {
+  eyebrow = 'How we build it',
+  heading = 'Our Integration',
+  highlight = 'Process.',
+  subhead,
+  stages = defaults,
+  class: className = '',
+} = Astro.props;
+---
+
+<section class={`relative overflow-hidden bg-navy py-20 sm:py-24 ${className}`}>
+  <div class="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true">
+    <div class="absolute -left-16 top-0 h-96 w-96 rounded-full bg-forge/15 blur-3xl motion-safe:animate-drift"></div>
+    <div class="absolute -right-16 bottom-0 h-96 w-96 rounded-full bg-circuit/15 blur-3xl motion-safe:animate-drift" style="animation-delay:-8s"></div>
+  </div>
+
+  <div class="container-page relative">
+    <SectionReveal>
+      <SectionHeading eyebrow={eyebrow} heading={heading} highlight={highlight} subhead={subhead} light />
+    </SectionReveal>
+
+    <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        stages.map((s, i) => (
+          <SectionReveal delay={(i % 3) * 100}>
+            <div class="group relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.06] p-6 transition duration-300 hover:-translate-y-1 hover:border-forge/40 hover:bg-white/[0.09]">
+              <p class="font-display text-4xl font-extrabold leading-none text-white/25 transition group-hover:text-forge">
+                {s.n}
+              </p>
+              <h3 class="mt-4 font-display text-lg font-bold text-white">{s.title}</h3>
+              <p class="mt-2 text-[0.95rem] leading-relaxed text-white/65">{s.body}</p>
+            </div>
+          </SectionReveal>
+        ))
+      }
+    </div>
+  </div>
+</section>

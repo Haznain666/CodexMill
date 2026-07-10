@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="252" height="56" viewBox="0 0 252 56" fill="none" role="img" aria-label="CodexMill">
+  <!-- Monogram badge -->
+  <rect x="4" y="4" width="48" height="48" rx="13" fill="#0B1A30"/>
+  <rect x="4.5" y="4.5" width="47" height="47" rx="12.5" stroke="url(#cmGrad)" stroke-opacity="0.55"/>
+  <!-- C arc -->
+  <path d="M34 18.5a9.5 9.5 0 1 0 0 19" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round"/>
+  <!-- M (mill) mark -->
+  <path d="M30 38V18l6 10 6-10v20" stroke="#F26419" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Wordmark -->
+  <text x="66" y="33" font-family="Barlow, 'Arial Black', Helvetica, sans-serif" font-weight="800" font-size="27" letter-spacing="-0.6">
+    <tspan fill="#0B1A30">Codex</tspan><tspan fill="#F26419">Mill</tspan>
+  </text>
+  <text x="67" y="46" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="7.5" letter-spacing="2.4" fill="#7C8A99">AUTOMATION &amp; GROWTH</text>
+
+  <defs>
+    <linearGradient id="cmGrad" x1="4" y1="4" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F26419"/>
+      <stop offset="1" stop-color="#2E9BE6"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,55 @@
+---
+/**
+ * SectionReveal — wraps content in a scroll-triggered fade + translate-up.
+ * Adds [data-reveal] (styled in global.css). A single IntersectionObserver
+ * (initialised once) toggles .is-visible. Supports stagger via `delay`.
+ * Reduced-motion users get final states immediately (handled in global.css).
+ */
+interface Props {
+  /** stagger delay in ms */
+  delay?: number;
+  /** wrapper element tag */
+  as?: string;
+  class?: string;
+}
+const { delay = 0, as = 'div', class: className = '' } = Astro.props;
+const Tag = as as any;
+---
+
+<Tag data-reveal class={className} style={delay ? `transition-delay:${delay}ms` : undefined}>
+  <slot />
+</Tag>
+
+<script>
+  // Initialise one shared observer for every [data-reveal] on the page.
+  (() => {
+    if ((window as any).__cmRevealInit) return;
+    (window as any).__cmRevealInit = true;
+
+    const reveal = () => {
+      const els = document.querySelectorAll('[data-reveal]:not(.is-visible)');
+      if (!('IntersectionObserver' in window)) {
+        els.forEach((el) => el.classList.add('is-visible'));
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              obs.unobserve(entry.target);
+            }
+          });
+        },
+        { rootMargin: '0px 0px -10% 0px', threshold: 0.12 }
+      );
+      els.forEach((el) => io.observe(el));
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', reveal);
+    } else {
+      reveal();
+    }
+  })();
+</script>

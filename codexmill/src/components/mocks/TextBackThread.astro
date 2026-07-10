@@ -1,0 +1,80 @@
+---
+/**
+ * TextBackThread — stylised phone SMS thread showing automated missed-call
+ * text-back. Configurable so industry pages can theme the conversation
+ * (HVAC job, med spa reminder, grooming rebook).
+ */
+interface Bubble {
+  from: 'them' | 'us';
+  text: string;
+  meta?: string;
+}
+interface Props {
+  contactName?: string;
+  /** small status line under the header */
+  status?: string;
+  bubbles?: Bubble[];
+}
+const {
+  contactName = 'New Lead · (555) 0142',
+  status = 'Auto text-back · replied in 0:47',
+  bubbles = [
+    { from: 'them', text: 'Missed call', meta: 'Missed call · just now' },
+    { from: 'us', text: "Hi! Sorry we missed you — how can we help? Reply here and we'll get you booked.", meta: 'Auto-reply · 0:47' },
+    { from: 'them', text: 'Need an AC repair quote this week' },
+    { from: 'us', text: '📅 Book your visit', meta: 'Booking link' },
+  ],
+} = Astro.props;
+---
+
+<div class="flex h-full flex-col">
+  <!-- header -->
+  <div class="flex items-center gap-3 border-b border-hairline px-4 py-3">
+    <span class="grid h-9 w-9 place-items-center rounded-full bg-forge/10 text-sm font-bold text-forge">●</span>
+    <div class="leading-tight">
+      <p class="text-sm font-bold text-navy">{contactName}</p>
+      <p class="text-[0.7rem] text-[#1FA34A]">{status}</p>
+    </div>
+  </div>
+
+  <!-- thread — anchored to the bottom so the newest message / booking link stays
+       visible; older messages scroll off the top (like a real messages app) -->
+  <div class="flex flex-1 flex-col justify-end gap-2 overflow-hidden bg-mist/60 px-3 py-3">
+    {
+      bubbles.map((b, i) => (
+        <div
+          class:list={['cm-bubble flex flex-col', b.from === 'us' ? 'items-end' : 'items-start']}
+          style={`--i:${i}`}
+        >
+          <div
+            class:list={[
+              'max-w-[84%] rounded-2xl px-3 py-2 text-[0.78rem] leading-snug shadow-soft',
+              b.from === 'us'
+                ? b.text.startsWith('📅')
+                  ? 'bg-forge font-semibold text-white'
+                  : 'bg-circuit text-white'
+                : 'bg-white text-navy ring-1 ring-hairline',
+            ]}
+          >
+            {b.text}
+          </div>
+          {b.meta && <span class="mt-1 px-1 text-[0.62rem] text-cool">{b.meta}</span>}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .cm-bubble {
+      opacity: 0;
+      animation: bubble-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: calc(var(--i) * 380ms + 300ms);
+    }
+    @keyframes bubble-in {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to { opacity: 1; transform: none; }
+    }
+  }
+</style>
