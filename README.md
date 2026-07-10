@@ -99,3 +99,4 @@ a price in markup — read it from the config.
 ---
 
 CodexMill is a service of Dispatch Globally LLC.
+# CodexMill
