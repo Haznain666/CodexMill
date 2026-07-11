@@ -8,7 +8,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import node from '@astrojs/node';
 
-const SITE_URL = 'https://staging.codexmill.com';
+const SITE_URL = 'https://codexmill.com';
 
 export default defineConfig({
   site: SITE_URL,
