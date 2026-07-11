@@ -1,3 +1,5 @@
+import { GHL_TIMEZONE } from "../../config/site";
+
 export interface DiscoveryPayload {
   [key: string]: unknown;
 }
@@ -45,12 +47,18 @@ function customField(key: string, value: unknown) {
   return { key, field_value: value };
 }
 
+export interface SubmitDiscoveryResult {
+  success: boolean;
+  /** GHL contact id from the upsert response, used to attach a booked appointment. */
+  contactId?: string;
+}
+
 export async function submitDiscoveryForm(
   payload: DiscoveryPayload
-): Promise<boolean> {
+): Promise<SubmitDiscoveryResult> {
   if (!GHL_API_KEY || !GHL_LOCATION_ID) {
     console.error("Missing GHL_API_KEY or GHL_LOCATION_ID env vars");
-    return false;
+    return { success: false };
   }
 
   let callDate = "";
@@ -60,15 +68,19 @@ export async function submitDiscoveryForm(
   if (payload.selectedCallSlot && typeof payload.selectedCallSlot === "string") {
     const dateObj = new Date(payload.selectedCallSlot);
     if (!isNaN(dateObj.getTime())) {
+      // Format in the GHL calendar's own timezone — not the server's local/UTC
+      // timezone — so the date/time sent to GHL matches what was actually booked.
       callDate = dateObj.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
+        timeZone: GHL_TIMEZONE,
       });
       callTime = dateObj.toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "2-digit",
         hour12: true,
+        timeZone: GHL_TIMEZONE,
       });
     }
   }
@@ -146,18 +158,20 @@ export async function submitDiscoveryForm(
   try {
     const res = await postToGHL(body);
     if (!res.ok) throw new Error(`GHL upsert failed: ${res.status} ${await res.text()}`);
+    const data = await res.json();
     console.log("Lead successfully sent to GHL");
-    return true;
+    return { success: true, contactId: data?.contact?.id || data?.id };
   } catch (error) {
     console.error("Error sending lead to GHL (attempt 1):", error);
     try {
       const res2 = await postToGHL(body);
       if (!res2.ok) throw new Error(`GHL upsert failed on retry: ${res2.status}`);
+      const data2 = await res2.json();
       console.log("Lead successfully sent to GHL on retry");
-      return true;
+      return { success: true, contactId: data2?.contact?.id || data2?.id };
     } catch (error2) {
       console.error("Error sending lead to GHL (retry failed):", error2);
-      return false;
+      return { success: false };
     }
   }
 }

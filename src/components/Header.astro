@@ -96,11 +96,9 @@ const isActive = (href: string) =>
       <div class="hidden items-center gap-2 lg:flex">
         <a
           href={LOGIN_URL}
-          class:list={[
-            'rounded-lg px-3.5 py-2 text-[0.95rem] font-medium transition',
-            isActive(LOGIN_URL) ? 'text-forge' : 'text-navy hover:text-forge',
-          ]}
-          aria-current={isActive(LOGIN_URL) ? 'page' : undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-lg px-3.5 py-2 text-[0.95rem] font-medium text-navy transition hover:text-forge"
         >
           Login
         </a>
@@ -168,10 +166,9 @@ const isActive = (href: string) =>
       }
       <a
         href={LOGIN_URL}
-        class:list={[
-          'border-b border-hairline py-3.5 text-lg font-semibold',
-          isActive(LOGIN_URL) ? 'text-forge' : 'text-navy',
-        ]}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="border-b border-hairline py-3.5 text-lg font-semibold text-navy"
       >
         Login
       </a>

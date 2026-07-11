@@ -310,7 +310,10 @@ async function submitDiscoveryForm(payload) {
   import { searchCities, cityLabel } from '../../config/cities';
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
-  const RECAPTCHA_SITE_KEY = '6LfXPygtAAAAADSbw0cdNjc-Pjm-s9w00z2v_Ddn';
+  // Site keys are domain-locked in Google reCAPTCHA — the Live key only works on
+  // codexmill.com/staging, not localhost, so this must come from env (PUBLIC_
+  // prefix required to reach the client bundle) rather than being hardcoded.
+  const RECAPTCHA_SITE_KEY = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY;
 
   const recaptchaWidgets = {};
 

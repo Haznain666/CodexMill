@@ -19,8 +19,16 @@ export const BOOKING_URL = 'https://link.codexmill.com/book-free-audit'; // [CON
  */
 export const GET_STARTED_URL = '/get-started';
 
-/** Client login page. UI only for now — no auth wired up yet. */
-export const LOGIN_URL = '/login';
+/** Client login — hosted app, opens in a new tab (not part of this site). */
+export const LOGIN_URL = 'https://app.codexmill.com';
+
+/**
+ * IANA timezone the GHL calendar is configured in. Booking slots are always
+ * fetched and displayed in this timezone, regardless of the visitor's own
+ * browser/location — so what a visitor sees always matches what's booked in GHL.
+ * [CONFIRM] must match the timezone set on the GHL calendar itself.
+ */
+export const GHL_TIMEZONE = 'America/New_York';
 
 /* ------------------------------------------------------------------ */
 /* Brand                                                              */

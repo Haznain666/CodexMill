@@ -6,7 +6,7 @@
   "description": "CodexMill marketing website — GHL automation & growth agency (a service of Dispatch Globally LLC).",
   "scripts": {
     "dev": "astro dev",
-    "start": "node ./dist/server/entry.mjs",
+    "start": "node -r dotenv/config ./dist/server/entry.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -22,6 +22,7 @@
     "@fontsource-variable/inter": "^5.1.1",
     "@fontsource/barlow": "^5.1.1",
     "astro": "^5.13.0",
+    "dotenv": "^17.4.2",
     "gsap": "^3.15.0",
     "tailwindcss": "^3.4.17"
   },

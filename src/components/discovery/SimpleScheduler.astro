@@ -14,6 +14,10 @@ interface Props {
   note?: string;
   class?: string;
   mode?: 'captcha' | 'picker';
+  /** JSON string: {startHour, endHour, slotMinutes}. Astro components don't auto-forward
+   * arbitrary attributes to their root element, so this must be declared explicitly or it
+   * silently never reaches the DOM (and the business-hours grid silently never renders). */
+  'data-time-config'?: string;
 }
 const {
   id = 'scheduler',
@@ -21,10 +25,11 @@ const {
   note = "We'll reach out at the number/email you provided. If this time doesn't work out, we'll reach out to reschedule.",
   class: className = '',
   mode = 'captcha',
+  'data-time-config': timeConfig,
 } = Astro.props;
 ---
 
-<div data-scheduler data-client-name={clientName} id={id} class={className} data-mode={mode}>
+<div data-scheduler data-client-name={clientName} id={id} class={className} data-mode={mode} data-time-config={timeConfig}>
   <!-- Calendar + slots -->
   <div data-picker>
     <!-- month header -->
@@ -32,7 +37,10 @@ const {
       <button type="button" data-prev aria-label="Previous month" class="grid h-9 w-9 place-items-center rounded-lg border border-hairline text-navy transition hover:bg-mist disabled:cursor-not-allowed disabled:opacity-40">
         <Icon name="arrow-right" size={16} class="rotate-180" />
       </button>
-      <p data-month-label class="font-display text-base font-bold text-navy"></p>
+      <p class="flex items-center gap-2">
+        <span data-month-label class="font-display text-base font-bold text-navy"></span>
+        <span data-month-loading class="hidden text-xs font-medium text-cool">Loading…</span>
+      </p>
       <button type="button" data-next-month aria-label="Next month" class="grid h-9 w-9 place-items-center rounded-lg border border-hairline text-navy transition hover:bg-mist">
         <Icon name="arrow-right" size={16} />
       </button>
@@ -44,7 +52,13 @@ const {
     </div>
 
     <!-- date grid (rendered by JS) -->
-    <div data-grid class="mt-1.5 grid grid-cols-7 gap-1"></div>
+    <div data-grid class="mt-1.5 grid grid-cols-7 gap-1 transition-opacity"></div>
+
+    <!-- availability error (shown if the live GHL slots fetch fails) -->
+    <div data-slots-error class="mt-3 hidden rounded-lg border border-[#D92D20]/30 bg-[#D92D20]/5 px-3 py-2 text-sm text-[#D92D20]">
+      <span data-error-msg>Unable to load availability. Please try again.</span>
+      <button type="button" data-retry-slots class="ml-1 font-semibold underline underline-offset-2">Retry</button>
+    </div>
 
     <!-- time slots (revealed after a date is picked) -->
     <div data-slots-wrap class="mt-6 hidden">
@@ -84,20 +98,7 @@ const {
 </div>
 
 <script>
-  const DEFAULT_SLOTS = [
-    { label: '8:00 AM', h: 8 },
-    { label: '9:00 AM', h: 9 },
-    { label: '10:00 AM', h: 10 },
-    { label: '11:00 AM', h: 11 },
-    { label: '12:00 PM', h: 12 },
-    { label: '1:00 PM', h: 13 },
-    { label: '2:00 PM', h: 14 },
-    { label: '3:00 PM', h: 15 },
-    { label: '4:00 PM', h: 16 },
-    { label: '5:00 PM', h: 17 },
-    { label: '6:00 PM', h: 18 },
-    { label: '7:00 PM', h: 19 },
-  ];
+  import { GHL_TIMEZONE } from '../../config/site';
 
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -116,11 +117,15 @@ const {
 
     const grid = root.querySelector('[data-grid]');
     const monthLabel = root.querySelector('[data-month-label]');
+    const monthLoading = root.querySelector('[data-month-loading]');
     const prevBtn = root.querySelector('[data-prev]');
     const nextBtn = root.querySelector('[data-next-month]');
     const slotsWrap = root.querySelector('[data-slots-wrap]');
     const slotsBox = root.querySelector('[data-slots]');
     const slotDateLabel = root.querySelector('[data-slot-date]');
+    const slotsErrorBox = root.querySelector('[data-slots-error]');
+    const slotsErrorMsg = root.querySelector('[data-error-msg]');
+    const retrySlotsBtn = root.querySelector('[data-retry-slots]');
     const captchaActions = root.querySelector('[data-captcha-actions]');
     const verifyArea = root.querySelector('[data-verify-area]');
     const verifyBtn = root.querySelector('[data-verify-human]');
@@ -137,21 +142,146 @@ const {
     let isoValue = null;
     let formattedValue = null;
 
-    // Parse time config from data-time-config attribute
-    let timeSlots = DEFAULT_SLOTS;
+    // Live availability from GoHighLevel — keyed by "YYYY-MM-DD" -> array of
+    // ISO datetime strings, for whichever month is currently in view.
+    let monthSlots = {};
+    const monthCache = new Map();
+    let loadToken = 0;
+
+    // Business-hours grid (startHour/endHour/slotMinutes) layered on top of the
+    // live GHL slots (data-time-config is passed in by DiscoveryForm.astro). This
+    // defines the fixed set of time buttons shown for every day — see
+    // buildSlotEntries() below for why we show the full grid instead of only
+    // whichever slots happen to be free.
+    let businessHours = null;
+    let slotMinutes = 60;
     try {
       const config = JSON.parse(root.dataset.timeConfig || '{}');
       if (config.startHour !== undefined && config.endHour !== undefined) {
-        timeSlots = [];
-        for (let h = config.startHour; h <= config.endHour; h++) {
-          const period = h >= 12 ? 'PM' : 'AM';
-          const displayH = h > 12 ? h - 12 : (h === 0 ? 12 : h);
-          timeSlots.push({ label: `${displayH}:00 ${period}`, h });
-        }
+        businessHours = { startHour: config.startHour, endHour: config.endHour };
       }
+      if (Number(config.slotMinutes) > 0) slotMinutes = Number(config.slotMinutes);
     } catch (e) {
-      console.warn('Invalid time config, using defaults:', e);
+      console.warn('Invalid time config, ignoring:', e);
     }
+
+    const dateKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    // Business-hours config (startHour/endHour) is defined in the GHL calendar's
+    // timezone, so read the time there — not the visitor's browser timezone.
+    const timePartsInGhlTimezone = (iso) => {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hourCycle: 'h23',
+        timeZone: GHL_TIMEZONE,
+      }).formatToParts(new Date(iso));
+      return {
+        hour: Number(parts.find((p) => p.type === 'hour').value),
+        minute: Number(parts.find((p) => p.type === 'minute').value),
+      };
+    };
+
+    const filterByBusinessHours = (isoList) => {
+      if (!businessHours) return isoList;
+      return isoList.filter((iso) => {
+        const { hour } = timePartsInGhlTimezone(iso);
+        return hour >= businessHours.startHour && hour <= businessHours.endHour;
+      });
+    };
+
+    const slotsForDate = (d) =>
+      filterByBusinessHours(monthSlots[dateKey(d)] || []).slice().sort((a, b) => new Date(a) - new Date(b));
+
+    // Every time button in the business-hours range, hour:minute only (no date) —
+    // the fixed grid that gets rendered for whichever day is selected.
+    const fullDayGrid = () => {
+      if (!businessHours) return [];
+      const times = [];
+      for (let mins = businessHours.startHour * 60; mins <= businessHours.endHour * 60; mins += slotMinutes) {
+        times.push({ hour: Math.floor(mins / 60), minute: mins % 60 });
+      }
+      return times;
+    };
+
+    // Merges the fixed business-hours grid with whatever GHL actually has free
+    // that day: every grid slot appears (iso: null if not bookable), and any
+    // free slot GHL returns off-grid still gets included. Keeping every slot in
+    // the DOM (disabled, not removed) is intentional — see caller.
+    const buildSlotEntries = (d) => {
+      const byTime = new Map();
+      fullDayGrid().forEach(({ hour, minute }) => byTime.set(`${hour}:${minute}`, { hour, minute, iso: null }));
+      (monthSlots[dateKey(d)] || []).forEach((iso) => {
+        const { hour, minute } = timePartsInGhlTimezone(iso);
+        byTime.set(`${hour}:${minute}`, { hour, minute, iso });
+      });
+      return Array.from(byTime.values()).sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
+    };
+
+    const setMonthLoading = (on) => {
+      monthLoading?.classList.toggle('hidden', !on);
+      grid.classList.toggle('opacity-50', on);
+      grid.classList.toggle('pointer-events-none', on);
+    };
+
+    const setSlotsError = (msg) => {
+      if (!slotsErrorBox) return;
+      slotsErrorBox.classList.toggle('hidden', !msg);
+      if (msg && slotsErrorMsg) slotsErrorMsg.textContent = msg;
+    };
+
+    const fetchMonthSlots = async (year, month) => {
+      const first = new Date(year, month, 1);
+      const last = new Date(year, month + 1, 0);
+      // Always request slots in the GHL calendar's own timezone — not the visitor's
+      // browser/location — so displayed times match what's actually booked in GHL.
+      const params = new URLSearchParams({
+        start: dateKey(first),
+        end: dateKey(last),
+        timezone: GHL_TIMEZONE,
+      });
+      const res = await fetch(`/api/ghl-slots?${params.toString()}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Unable to load availability. Please try again.');
+      }
+      return data.slots || {};
+    };
+
+    const loadMonth = async (year, month) => {
+      const cacheKey = `${year}-${month}`;
+      const myToken = ++loadToken;
+
+      if (monthCache.has(cacheKey)) {
+        monthSlots = monthCache.get(cacheKey);
+        setSlotsError(null);
+        renderGrid();
+        return;
+      }
+
+      setSlotsError(null);
+      setMonthLoading(true);
+      try {
+        const slots = await fetchMonthSlots(year, month);
+        if (myToken !== loadToken) return; // a newer month navigation superseded this request
+        monthCache.set(cacheKey, slots);
+        monthSlots = slots;
+        setMonthLoading(false);
+        renderGrid();
+      } catch (err) {
+        if (myToken !== loadToken) return;
+        console.error('Failed to load GHL calendar availability:', err);
+        monthSlots = {};
+        setMonthLoading(false);
+        setSlotsError(err.message || 'Unable to load availability. Please try again.');
+        renderGrid();
+      }
+    };
+
+    retrySlotsBtn?.addEventListener('click', () => {
+      monthCache.delete(`${viewY}-${viewM}`);
+      loadMonth(viewY, viewM);
+    });
 
     const syncButtons = () => {
       if (!isCaptchaMode()) {
@@ -189,23 +319,42 @@ const {
 
       // In picker mode, update hidden input and notify parent immediately
       if (!isCaptchaMode() && selected && slot) {
-        isoValue = `${selected.getFullYear()}-${pad(selected.getMonth() + 1)}-${pad(selected.getDate())}T${pad(slot.h)}:00:00`;
+        isoValue = slot.iso;
         hidden.value = isoValue;
         const formattedDate = selected.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         formattedValue = `${formattedDate} at ${slot.label}`;
       }
     };
 
-    const renderSlots = () => {
+    const formatHourMinuteLabel = (hour, minute) => {
+      const period = hour >= 12 ? 'PM' : 'AM';
+      const h12 = hour % 12 === 0 ? 12 : hour % 12;
+      return `${h12}:${pad(minute)} ${period}`;
+    };
+
+    // Renders every slot in the business-hours grid, not just the ones GHL has
+    // free. Slots with no matching iso are disabled/grayed-out rather than
+    // omitted, so the layout stays the same shape from day to day instead of
+    // reflowing every time availability changes.
+    const renderSlots = (d) => {
       slotsBox.innerHTML = '';
-      timeSlots.forEach((s) => {
+      buildSlotEntries(d).forEach(({ hour, minute, iso }) => {
+        const label = formatHourMinuteLabel(hour, minute);
         const b = document.createElement('button');
         b.type = 'button';
-        b.textContent = s.label;
-        b.setAttribute('aria-pressed', 'false');
-        b.className =
-          'rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-navy transition hover:border-forge/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge/30';
-        b.addEventListener('click', () => pickSlot(s, b));
+        b.textContent = label;
+        if (iso) {
+          b.setAttribute('aria-pressed', 'false');
+          b.className =
+            'rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-navy transition hover:border-forge/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge/30';
+          b.addEventListener('click', () => pickSlot({ iso, label }, b));
+        } else {
+          b.disabled = true;
+          b.setAttribute('aria-disabled', 'true');
+          b.setAttribute('aria-label', `${label}, not available`);
+          b.className =
+            'cursor-not-allowed rounded-lg border border-hairline px-4 py-2 text-sm font-medium text-cool/40 line-through';
+        }
         slotsBox.appendChild(b);
       });
     };
@@ -215,7 +364,7 @@ const {
       slot = null;
       captchaVerified = false;
       renderGrid();
-      renderSlots();
+      renderSlots(d);
       slotsWrap.classList.remove('hidden');
       slotDateLabel.textContent = `· ${MONTHS[d.getMonth()]} ${d.getDate()}`;
       syncButtons();
@@ -236,21 +385,23 @@ const {
       for (let day = 1; day <= days; day++) {
         const d = new Date(viewY, viewM, day);
         const isPast = d < today;
+        const hasSlots = slotsForDate(d).length > 0;
+        const isDisabled = isPast || !hasSlots;
         const isToday = d.getTime() === today.getTime();
         const isSel = selected && d.getTime() === selected.getTime();
         const cell = document.createElement('button');
         cell.type = 'button';
         cell.textContent = String(day);
-        cell.disabled = isPast;
-        cell.setAttribute('aria-label', `${MONTHS[viewM]} ${day}, ${viewY}`);
+        cell.disabled = isDisabled;
+        cell.setAttribute('aria-label', `${MONTHS[viewM]} ${day}, ${viewY}${!isPast && !hasSlots ? ' (no times available)' : ''}`);
         cell.setAttribute('aria-pressed', String(Boolean(isSel)));
         cell.className = [
           'grid h-10 place-items-center rounded-lg text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge/40',
-          isPast ? 'cursor-not-allowed text-cool/40' : 'text-navy hover:bg-mist',
+          isDisabled ? 'cursor-not-allowed text-cool/40' : 'text-navy hover:bg-mist',
           isSel ? 'bg-forge font-bold text-white hover:bg-forge' : '',
           isToday && !isSel ? 'font-bold ring-1 ring-forge/40' : '',
         ].join(' ');
-        if (!isPast) cell.addEventListener('click', () => pickDate(d));
+        if (!isDisabled) cell.addEventListener('click', () => pickDate(d));
         grid.appendChild(cell);
       }
     };
@@ -258,11 +409,11 @@ const {
     prevBtn.addEventListener('click', () => {
       if (prevBtn.disabled) return;
       viewM--; if (viewM < 0) { viewM = 11; viewY--; }
-      renderGrid();
+      loadMonth(viewY, viewM);
     });
     nextBtn.addEventListener('click', () => {
       viewM++; if (viewM > 11) { viewM = 0; viewY++; }
-      renderGrid();
+      loadMonth(viewY, viewM);
     });
 
     // ===== CAPTCHA MODE ONLY: Verify Human button =====
@@ -270,7 +421,7 @@ const {
       verifyBtn.addEventListener('click', () => {
         if (!isCaptchaMode() || !selected || !slot) return;
 
-        isoValue = `${selected.getFullYear()}-${pad(selected.getMonth() + 1)}-${pad(selected.getDate())}T${pad(slot.h)}:00:00`;
+        isoValue = slot.iso;
         hidden.value = isoValue;
         const formattedDate = selected.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         formattedValue = `${formattedDate} at ${slot.label}`;
@@ -330,7 +481,7 @@ const {
       renderGrid();
     });
 
-    renderGrid();
+    loadMonth(viewY, viewM);
   }
 
   document.querySelectorAll('[data-scheduler]').forEach(initScheduler);
