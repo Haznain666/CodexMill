@@ -22,7 +22,7 @@ const projects = [
   },
     {
     id: 4,
-    url: "thepoolcleaners.codexmill.com",
+    url: "mareeaesthetics.codexmill.com",
     image: "/4tpc.png",
   },
     {
@@ -75,7 +75,7 @@ const projects = [
               style={`z-index: ${projects.length - index};`}
             >
               <!-- Card - wide, proper height -->
-              <div class="absolute w-full flex justify-center top-[122px] overflow-hidden">
+              <div class="absolute w-full flex justify-center top-[17%] overflow-hidden">
                 
                 <!-- Card Inner with proper padding -->
                     <a 
@@ -90,6 +90,7 @@ const projects = [
                       </svg>
                     </a>
                   </div>
+                      <a href={`https://${project.url}/`} target="_blank" rel="noopener noreferrer" >
                       <img 
                         src={project.image} 
                         alt={`${project.name} Portfolio`}
@@ -97,6 +98,7 @@ const projects = [
                         loading={index === 0 ? "eager" : "lazy"}
                         decoding="async"
                       />
+                      </a>
                     </div>
                   </a>
                 </div>
@@ -116,7 +118,7 @@ const projects = [
   /* ========================================== */
   /* MOBILE RESPONSIVE - BELOW 768px            */
   /* ========================================== */
-  @media (max-width: 767px) {
+  @media (max-width: 167px) {
     /* Scroll track becomes auto height */
     .portfolio-scroll-track {
       height: auto !important;
@@ -155,7 +157,7 @@ const projects = [
   /* ========================================== */
   /* TABLET - 768px to 1023px                   */
   /* ========================================== */
-  @media (min-width: 768px) and (max-width: 1023px) {
+  @media (min-width: 168px) and (max-width: 1023px) {
     .portfolio-scroll-track {
       height: 300vh;
     }
@@ -197,7 +199,7 @@ const projects = [
     // ==========================================
     // DESKTOP + TABLET (768px and up)
     // ==========================================
-    mm.add("(min-width: 768px)", () => {
+    mm.add("(min-width: 168px)", () => {
       
       // Initial states
       gsap.set(cards[0], { 
