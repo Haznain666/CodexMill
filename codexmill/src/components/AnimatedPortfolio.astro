@@ -3,259 +3,341 @@ layout: false
 
 import SectionReveal from '../components/SectionReveal.astro';
 import SectionHeading from '../components/SectionHeading.astro';
+
+const projects = [
+  {
+    id: 1,
+    name: "Furry Friends",
+    url: "furryfriends.codexmill.com",
+    image: "/furryFriendsBanner.png",
+    color: "#e91e8c"
+  },
+  {
+    id: 2,
+    name: "Green Yards",
+    url: "greenyards.codexmill.com",
+    image: "/greenYardsBanner.png",
+    color: "#2d7d32"
+  },
+  {
+    id: 3,
+    name: "Marée Aesthetics",
+    url: "mareeaesthetics.codexmill.com",
+    image: "/medSpaBanner.png",
+    color: "#1a1a2e"
+  }
+];
 ---
 
-<section id="portfolio-section" class="relative w-full text-white flex flex-col items-center justify-start overflow-hidden mt-12 select-none">
-    <div class="container-page mb-8">
-      <SectionReveal>
-        <SectionHeading
-          eyebrow="The brochure trap"
-          heading="Most Small-Business Sites"
-          highlight="Just Sit There."
-          subhead="Good design isn't enough if your site doesn't convert. Without automated follow-ups or clear booking paths, you're losing leads every day. We’ve designed a better way to capture and convert your traffic. Take a look:"
-        />
-      </SectionReveal>
-    </div>
+<section id="portfolio-section" class="relative w-full bg-white text-gray-900">
+  
+  <!-- ========================================== -->
+  <!-- HEADING - NORMAL SCROLL                    -->
+  <!-- ========================================== -->
+  <div class="container-page pt-16 pb-8 md:pt-24 md:pb-12">
+    <SectionReveal>
+      <SectionHeading
+        eyebrow="The brochure trap"
+        heading="Most Small-Business Sites"
+        highlight="Just Sit There."
+        subhead="Good design isn't enough if your site doesn't convert. Without automated follow-ups or clear booking paths, you're losing leads every day. We've designed a better way to capture and convert your traffic. Take a look:"
+      />
+    </SectionReveal>
+  </div>
 
-
-  <div id="portfolio-sticky-wrapper" class="relative w-full flex flex-1 items-center justify-center px-4 md:px-8">
+  <!-- ========================================== -->
+  <!-- CARDS AREA - STICKY SCROLL ANIMATION       -->
+  <!-- ========================================== -->
+  <div id="portfolio-cards-area" class="relative w-full">
     
-    <div class="relative w-full max-w-6xl aspect-[4/3] md:aspect-video rounded-xl md:rounded-xl shadow-xl overflow-hidden">
+    <!-- Scroll track - tall enough for all card transitions -->
+    <div class="portfolio-scroll-track relative w-full" style="height: 350vh;">
       
-      <!-- Slide 1 (Base layer) -->
-      <div class="portfolio-slide absolute inset-0 w-full h-full will-change-transform z-[1]">
-        <div class="slide-overlay relative absolute inset-0 bg-black/0 transition-colors duration-300 pointer-events-none"></div>
+      <!-- Sticky viewport -->
+      <div class="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden py-8 md:py-12">
         
-<a
-  href="https://furryfriends.codexmill.com/"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  <h1 class="absolute top-[110px] left-1/2 -translate-x-1/2 flex justify-center font-normal font-['Inter_Variable'] text-sky-400 underline">
-    furryfriends.codexmill.com
-  </h1>
-</a>
+        <!-- Card container - FULL WIDTH like header/footer -->
+        <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center">
+          
+          {projects.map((project, index) => (
+            <div 
+              class="portfolio-card absolute w-full will-change-transform"
+              data-index={index}
+              style={`z-index: ${projects.length - index};`}
+            >
+              <!-- Card - wide, proper height -->
+              <div class="relative bg-gray-50 rounded-2xl md:rounded-3xl shadow-2xl border border-gray-200/60 overflow-hidden">
+                
+                <!-- Card Inner with proper padding -->
+                <div class="p-6 sm:p-8 md:p-12 lg:p-16">
+                  
+                  <!-- Project Name -->
+                  <div class="flex items-center justify-center gap-3 mb-6 md:mb-10">
+                    <h3 class="text-3xl md:text-4xl lg:text-5xl font-bold text-center" style={`color: ${project.color}`}>
+                      {project.name}
+                    </h3>
+                  </div>
 
-       <img 
-          src="/furryFriendsBanner.png" 
-          alt="Furry Friends Portfolio Banner" 
-          class="w-full h-full object-cover select-none pointer-events-none"
-          loading="eager"
-          decoding="async"
-        />
+                  <!-- Image Container - proper aspect ratio -->
+                  <a href={`https://${project.url}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="block w-full"
+                  >
+                    <div class="relative w-full rounded-xl overflow-hidden bg-white shadow-inner">
+                      <img 
+                        src={project.image} 
+                        alt={`${project.name} Portfolio`}
+                        class="w-full h-full "
+                        loading={index === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                      />
+                    </div>
+                  </a>
+
+                  <!-- URL -->
+                  <div class="mt-6 md:mt-8 text-center">
+                    <a 
+                      href={`https://${project.url}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 font-medium text-sm md:text-base transition-colors"
+                    >
+                      <span class="underline underline-offset-4">{project.url}</span>
+                      <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Overlay for previous cards -->
+              <div class="card-overlay absolute inset-0 bg-black/0 rounded-2xl md:rounded-3xl pointer-events-none transition-colors duration-500" />
+            </div>
+          ))}
+        </div>
+
+        <!-- Pagination Dots - right side -->
+        <div class="hidden md:flex absolute right-4 lg:right-8 xl:right-12 top-1/2 -translate-y-1/2 z-50 flex-col gap-3">
+          {projects.map((_, index) => (
+            <div 
+              class="portfolio-dot w-3 h-3 rounded-full bg-gray-300 transition-all duration-500 cursor-pointer hover:bg-gray-400" 
+              data-index={index} 
+            />
+          ))}
+        </div>
       </div>
-
-      <!-- Slide 2 (Initially below viewport) -->
-      <div class="portfolio-slide absolute inset-0 w-full h-full will-change-transform z-[2]">
-        <div class="slide-overlay relative absolute inset-0 bg-black/0 transition-colors duration-300 pointer-events-none"></div>
-          <a
-            href="https://greenyards.codexmill.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h1 class="absolute top-[110px] left-1/2 -translate-x-1/2 flex justify-center font-normal font-['Inter_Variable'] text-sky-400 underline">
-              greenyards.codexmill.com
-            </h1>
-          </a>        <img 
-          src="/greenYardsBanner.png" 
-          alt="Green Yards Portfolio Banner" 
-          class="w-full h-full object-cover select-none pointer-events-none"
-          loading="eager"
-          decoding="async"
-        />
-      </div>
-
-      <!-- Slide 3 (Initially below viewport) -->
-      <div class="portfolio-slide absolute inset-0 w-full h-full will-change-transform z-[3]">
-        <div class="slide-overlay relative absolute inset-0 bg-black/0 transition-colors duration-300 pointer-events-none"></div>
-          <a
-            href="https://mareeaesthetics.codexmill.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h1 class="absolute top-[110px] left-1/2 -translate-x-1/2 flex justify-center font-normal font-['Inter_Variable'] text-sky-400 underline">
-              mareeaesthetics.codexmill.com
-            </h1>
-          </a>        
-          <img 
-          src="/medSpaBanner.png" 
-          alt="Med Spa Portfolio Banner" 
-          class="w-full h-full object-cover select-none pointer-events-none"
-          loading="eager"
-          decoding="async"
-        />
-      </div>
-
     </div>
-
-    <div id="portfolio-pagination" class="hidden md:flex fixed right-8 lg:right-12 top-1/2 -translate-y-1/2 z-40 flex-col gap-6 items-center justify-center mix-blend-difference pointer-events-none">
-      <div class="portfolio-dot w-2 h-2 rounded-full bg-white transition-all duration-500 ease-out" data-index="0"></div>
-      <div class="portfolio-dot w-2 h-2 rounded-full bg-white opacity-25 transition-all duration-500 ease-out" data-index="1"></div>
-      <div class="portfolio-dot w-2 h-2 rounded-full bg-white opacity-25 transition-all duration-500 ease-out" data-index="2"></div>
-    </div>
-
   </div>
 </section>
 
 <style>
+  /* ========================================== */
+  /* MOBILE RESPONSIVE - BELOW 768px            */
+  /* ========================================== */
   @media (max-width: 767px) {
-    #portfolio-section {
-      overflow: visible !important;
+    /* Scroll track becomes auto height */
+    .portfolio-scroll-track {
       height: auto !important;
     }
-    #portfolio-sticky-wrapper {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 1.5rem !important;
-      padding: 0 1rem !important;
-      height: auto !important;
-    }
-    #portfolio-sticky-wrapper > div {
+    
+    /* Sticky becomes relative (normal flow) */
+    .sticky {
       position: relative !important;
-      aspect-ratio: 4/3 !important;
-      overflow: visible !important;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
       height: auto !important;
+      min-height: auto !important;
+      padding-top: 2rem !important;
+      padding-bottom: 2rem !important;
     }
-    .portfolio-slide {
+    
+    /* Cards stack normally */
+    .portfolio-card {
       position: relative !important;
+      width: 100% !important;
+      margin-bottom: 1.5rem;
       transform: none !important;
-      margin-bottom: 1rem;
-      border-radius: 0.75rem;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border: 1px solid rgba(64, 64, 64, 0.4);
+      opacity: 1 !important;
+      z-index: auto !important;
     }
-    .portfolio-slide:last-child {
+    
+    .portfolio-card:last-child {
       margin-bottom: 0;
     }
+    
+    /* Hide dots and overlays on mobile */
+    .portfolio-dot,
+    .card-overlay {
+      display: none !important;
+    }
+  }
+
+  /* ========================================== */
+  /* TABLET - 768px to 1023px                   */
+  /* ========================================== */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .portfolio-scroll-track {
+      height: 300vh;
+    }
+  }
+
+  /* ========================================== */
+  /* DOT ACTIVE STATE                           */
+  /* ========================================== */
+  .portfolio-dot.active {
+    background-color: #0ea5e9;
+    transform: scale(1.5);
+    box-shadow: 0 0 16px rgba(14, 165, 233, 0.5);
+  }
+  
+  .portfolio-dot:not(.active) {
+    opacity: 0.5;
   }
 </style>
 
 <script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
   gsap.registerPlugin(ScrollTrigger);
 
+  let initialized = false;
+
   function initPortfolioAnimation() {
-    const section = document.getElementById('portfolio-section');
-    const wrapper = document.getElementById('portfolio-sticky-wrapper');
-    const slides = document.querySelectorAll('.portfolio-slide');
+    if (initialized) return;
+    initialized = true;
+
+    const scrollTrack = document.querySelector('.portfolio-scroll-track');
+    const cards = document.querySelectorAll('.portfolio-card');
     const dots = document.querySelectorAll('.portfolio-dot');
 
-    if (!section || !wrapper || slides.length < 3) return;
+    if (!scrollTrack || cards.length < 2) return;
 
-    // Clean up previous triggers
-    ScrollTrigger.getAll().forEach(trigger => {
-      if (trigger.trigger === section || trigger.trigger === wrapper) {
-        trigger.kill(true);
-      }
-    });
+    const mm = gsap.matchMedia();
 
-    let mm = gsap.matchMedia();
-
+    // ==========================================
+    // DESKTOP + TABLET (768px and up)
+    // ==========================================
     mm.add("(min-width: 768px)", () => {
-      // ===== INITIAL STATES =====
-      // Slide 1: visible, no overlay
-      gsap.set(slides[0], { yPercent: 0, scale: 1 });
-      gsap.set(slides[0].querySelector('.slide-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
       
-      // Slide 2: below viewport, no overlay
-      gsap.set(slides[1], { yPercent: 100, scale: 1 });
-      gsap.set(slides[1].querySelector('.slide-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
-      
-      // Slide 3: below viewport, no overlay
-      gsap.set(slides[2], { yPercent: 100, scale: 1 });
-      gsap.set(slides[2].querySelector('.slide-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
+      // Initial states
+      gsap.set(cards[0], { 
+        yPercent: 0, 
+        scale: 1, 
+        opacity: 1,
+        rotateX: 0 
+      });
+      gsap.set(cards[0].querySelector('.card-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
 
-      // ===== PAGINATION UPDATE =====
+      for (let i = 1; i < cards.length; i++) {
+        gsap.set(cards[i], { 
+          yPercent: 100, 
+          scale: 0.85, 
+          opacity: 0,
+          rotateX: 8 
+        });
+      }
+
+      // Update dots based on progress
       const updateDots = (progress) => {
-        // Calculate which slide is active based on timeline progress
-        // Timeline structure: 0-0.33 = Slide 1, 0.33-0.66 = Slide 2, 0.66-1.0 = Slide 3
-        let activeIndex = 0;
-        if (progress < 0.33) activeIndex = 0;
-        else if (progress < 0.66) activeIndex = 1;
-        else activeIndex = 2;
-
-        dots.forEach((dot, index) => {
-          if (index === activeIndex) {
-            dot.classList.add('scale-[1.4]', 'shadow-[0_0_15px_rgba(255,255,255,1)]');
-            dot.classList.remove('opacity-25');
+        const segmentSize = 1 / cards.length;
+        const activeIndex = Math.min(Math.floor(progress / segmentSize), cards.length - 1);
+        
+        dots.forEach((dot, i) => {
+          if (i === activeIndex) {
+            dot.classList.add('active');
           } else {
-            dot.classList.remove('scale-[1.4]', 'shadow-[0_0_15px_rgba(255,255,255,1)]');
-            dot.classList.add('opacity-25');
+            dot.classList.remove('active');
           }
         });
       };
 
-      // ===== MASTER TIMELINE =====
-      const masterTimeline = gsap.timeline({
+      // Master timeline
+      const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: section,
+          trigger: scrollTrack,
           start: "top top",
-          end: "+=400%",
-          pin: true,
-          scrub: 1.2,
-          anticipatePin: 1,
+          end: "bottom bottom",
+          scrub: 0.8,
           invalidateOnRefresh: true,
           fastScrollEnd: true,
           onUpdate: (self) => updateDots(self.progress)
         }
       });
 
-      // --- PHASE 1: Slide 2 enters (0% to 33% of scroll) ---
-      masterTimeline
-        .to(slides[1], { 
-          yPercent: 0, 
-          duration: 1,
-          ease: "power2.out" 
-        }, 0)
-        .to(slides[0], { 
-          scale: 0.92, 
-          duration: 1,
-          ease: "power2.out" 
-        }, 0)
-        .to(slides[0].querySelector('.slide-overlay'), {
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          duration: 1,
-          ease: "power2.out"
-        }, 0);
+      const segmentDuration = 1;
 
-      // --- PHASE 2: Slide 3 enters (33% to 66% of scroll) ---
-      masterTimeline
-        .to(slides[2], { 
+      for (let i = 0; i < cards.length - 1; i++) {
+        const t = i * segmentDuration;
+        
+        // Next card slides UP from bottom
+        tl.to(cards[i + 1], { 
           yPercent: 0, 
-          duration: 1,
-          ease: "power2.out" 
-        }, 1)
-        .to(slides[1], { 
-          scale: 0.92, 
-          duration: 1,
-          ease: "power2.out" 
-        }, 1)
-        .to(slides[1].querySelector('.slide-overlay'), {
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          duration: 1,
-          ease: "power2.out"
-        }, 1);
+          scale: 1, 
+          opacity: 1,
+          rotateX: 0,
+          duration: segmentDuration, 
+          ease: "power2.inOut" 
+        }, t);
+        
+        // Current card exits UP + scales down + fades
+        tl.to(cards[i], { 
+          yPercent: -60, 
+          scale: 0.8, 
+          opacity: 0,
+          rotateX: -5,
+          duration: segmentDuration, 
+          ease: "power2.inOut" 
+        }, t);
+        
+        // Current card darkens slightly
+        tl.to(cards[i].querySelector('.card-overlay'), { 
+          backgroundColor: "rgba(0,0,0,0.15)", 
+          duration: segmentDuration 
+        }, t);
+      }
 
-      // --- PHASE 3: Hold final state (66% to 100% of scroll) ---
-      masterTimeline.to({}, { duration: 1 });
+      // Click dots to navigate
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          const targetY = scrollTrack.offsetTop + (scrollTrack.offsetHeight * (index / cards.length));
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        });
+      });
 
       return () => {
-        gsap.set(slides, { clearProps: "all" });
-        slides.forEach(slide => {
-          const overlay = slide.querySelector('.slide-overlay');
-          if (overlay) gsap.set(overlay, { clearProps: "all" });
+        gsap.set(cards, { clearProps: "all" });
+        cards.forEach(c => {
+          const o = c.querySelector('.card-overlay');
+          if (o) gsap.set(o, { clearProps: "all" });
         });
       };
     });
+
+    // ==========================================
+    // MOBILE (below 768px) - Fade up on scroll
+    // ==========================================
+    mm.add("(max-width: 767px)", () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            gsap.fromTo(entry.target, 
+              { opacity: 0, y: 50, scale: 0.95 },
+              { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" }
+            );
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+      cards.forEach(card => {
+        gsap.set(card, { opacity: 0, y: 50, scale: 0.95 });
+        observer.observe(card);
+      });
+
+      return () => observer.disconnect();
+    });
   }
 
-  // Astro page-load lifecycle
   document.addEventListener('astro:page-load', initPortfolioAnimation);
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     initPortfolioAnimation();
