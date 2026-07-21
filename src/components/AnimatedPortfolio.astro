@@ -22,7 +22,7 @@ const projects = [
   },
     {
     id: 4,
-    url: "mareeaesthetics.codexmill.com",
+    url: "thepoolcleaners.codexmill.com",
     image: "/4tpc.png",
   },
     {
@@ -63,7 +63,7 @@ const projects = [
     <div class="portfolio-scroll-track relative w-full" style="height: 350vh;">
       
       <!-- Sticky viewport -->
-      <div class="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden py-8 md:py-12">
+      <div class="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden px-4 py-8 md:py-12">
         
         <!-- Card container - FULL WIDTH like header/footer -->
         <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center">
@@ -82,7 +82,8 @@ const projects = [
                       href={`https://${project.url}/`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 font-medium text-sm md:text-base transition-colors"
+                      class="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 font-medium text-xs md:text-base transition-colors"
+                      
                     >
                       <span class="underline underline-offset-4">{project.url}</span>
                       <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
