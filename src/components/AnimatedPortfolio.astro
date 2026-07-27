@@ -92,18 +92,14 @@ const projects = [
                     </a>
                   </div>
                       <a href={`https://${project.url}/`} target="_blank" rel="noopener noreferrer" >
-                      <img 
-                        src={project.image} 
-                        alt={`${project.name} Portfolio`}
+                      <img
+                        src={project.image}
+                        alt={`${project.url} Portfolio`}
                         class="w-full h-full rounded-xl"
                         loading={index === 0 ? "eager" : "lazy"}
                         decoding="async"
                       />
                       </a>
-                    </div>
-                  </a>
-                </div>
-              </div>
 
               <!-- Overlay for previous cards -->
               <div class="card-overlay absolute inset-0 bg-black/0 rounded-2xl md:rounded-3xl pointer-events-none transition-colors duration-500" />
@@ -203,33 +199,50 @@ const projects = [
     mm.add("(min-width: 168px)", () => {
       
       // Initial states
-      gsap.set(cards[0], { 
-        yPercent: 0, 
-        scale: 1, 
+      gsap.set(cards[0], {
+        yPercent: 0,
+        scale: 1,
         opacity: 1,
-        rotateX: 0 
+        rotateX: 0,
+        zIndex: cards.length + 1,
+        pointerEvents: 'auto'
       });
       gsap.set(cards[0].querySelector('.card-overlay'), { backgroundColor: 'rgba(0,0,0,0)' });
 
       for (let i = 1; i < cards.length; i++) {
-        gsap.set(cards[i], { 
-          yPercent: 100, 
-          scale: 0.85, 
+        gsap.set(cards[i], {
+          yPercent: 100,
+          scale: 0.85,
           opacity: 0,
-          rotateX: 8 
+          rotateX: 8,
+          zIndex: cards.length - i,
+          pointerEvents: 'none'
         });
       }
 
-      // Update dots based on progress
-      const updateDots = (progress) => {
+      // Update dots + which card can receive clicks, based on progress.
+      // Static z-index/pointer-events would leave earlier cards clickable
+      // forever (they only fade out, they don't stop catching clicks),
+      // so only the currently active card gets pointerEvents/top z-index.
+      const updateActiveCard = (progress) => {
         const segmentSize = 1 / cards.length;
         const activeIndex = Math.min(Math.floor(progress / segmentSize), cards.length - 1);
-        
+
         dots.forEach((dot, i) => {
           if (i === activeIndex) {
             dot.classList.add('active');
           } else {
             dot.classList.remove('active');
+          }
+        });
+
+        cards.forEach((card, i) => {
+          if (i === activeIndex) {
+            card.style.zIndex = String(cards.length + 1);
+            card.style.pointerEvents = 'auto';
+          } else {
+            card.style.zIndex = String(cards.length - i);
+            card.style.pointerEvents = 'none';
           }
         });
       };
@@ -243,7 +256,7 @@ const projects = [
           scrub: 0.8,
           invalidateOnRefresh: true,
           fastScrollEnd: true,
-          onUpdate: (self) => updateDots(self.progress)
+          onUpdate: (self) => updateActiveCard(self.progress)
         }
       });
 
